@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
-  <title>ZB WhatsApp</title>
+  <title>ZB WhatsApp Pro</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -18,30 +18,30 @@
       flex-grow: 1;
       padding: 10px;
       overflow-y: auto;
-      /* WhatsApp background pattern-like color */
       background-color: #e5ddd5; 
-      /* --- CHANGE 1: Wallpaper Image added --- */
       background-image: url('box Wallpaper.png'); 
-      background-size: cover; /* Image ko poore container par cover karega */
-      background-position: center; /* Image ko center mein rakhega */
-      /* Agar image load na ho toh fallback color */
+      background-size: cover;
+      background-position: center;
       background-color: #e5ddd5; 
-      /* --- END CHANGE 1 --- */
       display: flex;
       flex-direction: column;
       padding-top: 50px; 
-      padding-bottom: 70px;
+      padding-bottom: 120px;
     }
     .chat-header {
         position: fixed;
         top: 0;
         width: 100%;
-        /* Dark WhatsApp Green Header */
         background-color: #075e54; 
         color: white;
         padding: 10px 15px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .header-left {
         display: flex;
         align-items: center;
     }
@@ -54,7 +54,7 @@
         margin-left: 8px;
     }
     .online {
-        background-color: #25d366; /* WhatsApp Online Green */
+        background-color: #25d366;
     }
     .message {
       margin-bottom: 8px;
@@ -65,7 +65,7 @@
       line-height: 1.5;
       position: relative;
       font-size: 18px;
-      box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13); /* Slight WhatsApp shadow */
+      box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
     }
     .sent {
       background-color: #dcf8c6;
@@ -82,7 +82,7 @@
       color: #777;
       margin-bottom: 2px;
       display: block;
-      font-weight: bold; /* Naam ko thora bold kiya */
+      font-weight: bold;
     }
     .timestamp-tick {
         font-size: 12px;
@@ -90,6 +90,9 @@
         float: right;
         margin-left: 8px;
         line-height: 1.5;
+    }
+    .double-tick {
+        color: #53bdeb;
     }
     .context-menu {
         position: fixed;
@@ -104,50 +107,237 @@
         padding: 10px 20px;
         cursor: pointer;
         font-size: 16px;
-        color: #c0392b;
     }
     .context-menu-item:hover {
         background-color: #f0f0f0;
     }
+    .delete-option {
+        color: #c0392b;
+    }
+    .edit-option {
+        color: #2980b9;
+    }
+    .reply-option {
+        color: #27ae60;
+    }
+    .forward-option {
+        color: #f39c12;
+    }
+
+    /* INPUT AREA - FIXED */
     .input-area {
       display: flex;
-      padding: 8px; /* Thora sa kam padding */
-      /* Light grey ya thora sa white look */
-      background-color: #f6f6f6; 
+      padding: 10px;
+      background-color: #f6f6f6;
       position: fixed;
       bottom: 0;
       width: 100%;
       box-sizing: border-box;
       align-items: center;
+      border-top: 1px solid #ddd;
+      gap: 8px;
+    }
+    .input-left {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .input-right {
+        display: flex;
+        align-items: center;
+        gap: 5px;
     }
     #messageInput {
       flex-grow: 1;
-      padding: 12px;
+      padding: 12px 16px;
       border-radius: 20px;
       border: none;
-      margin-right: 8px;
-      font-size: 18px;
+      font-size: 16px;
       background-color: white;
+      outline: none;
+    }
+    .icon-button {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 50%;
+        background: none;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #54656f;
+    }
+    .icon-button:hover {
+        background-color: #e0e0e0;
     }
     #sendButton {
-      width: 45px;
-      height: 45px;
-      border: none;
-      border-radius: 50%;
-      /* WhatsApp Send Button Green */
-      background-color: #128c7e; 
-      color: white;
-      cursor: pointer;
-      font-size: 20px;
-      line-height: 45px;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
+        width: 45px;
+        height: 45px;
+        border: none;
+        border-radius: 50%;
+        background-color: #128c7e;
+        color: white;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    #sendButton:hover {
+        background-color: #075e54;
     }
 
-    /* Name Modal Styles (Same, already good) */
+    /* Emoji Picker */
+    .emoji-picker {
+        position: fixed;
+        bottom: 70px;
+        right: 10px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        padding: 10px;
+        display: none;
+        z-index: 30;
+        max-height: 200px;
+        overflow-y: auto;
+        width: 250px;
+    }
+    .emoji {
+        font-size: 20px;
+        padding: 5px;
+        cursor: pointer;
+        display: inline-block;
+    }
+    .emoji:hover {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+        font-size: 12px;
+        color: #999;
+        padding: 5px 15px;
+        font-style: italic;
+        display: none;
+    }
+
+    /* Reply Preview */
+    .reply-preview {
+        background: #f0f0f0;
+        border-left: 4px solid #128c7e;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        font-size: 14px;
+        display: none;
+        position: relative;
+    }
+    .reply-sender {
+        font-weight: bold;
+        color: #128c7e;
+    }
+    .cancel-reply {
+        position: absolute;
+        right: 10px;
+        top: 8px;
+        cursor: pointer;
+        color: #999;
+        font-size: 16px;
+    }
+
+    /* File Upload */
+    .file-upload {
+        display: none;
+    }
+    .file-preview {
+        max-width: 200px;
+        margin: 5px 0;
+        border-radius: 5px;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        margin-left: 15px;
+    }
+
+    /* Dark Theme */
+    .dark-theme {
+        background-color: #0d1418;
+        color: white;
+    }
+    .dark-theme .chat-container {
+        background-color: #0d1418;
+    }
+    .dark-theme .message.received {
+        background-color: #2a2f32;
+        color: white;
+    }
+    .dark-theme .input-area {
+        background-color: #1e2a30;
+    }
+    .dark-theme #messageInput {
+        background-color: #2a3942;
+        color: white;
+    }
+
+    /* Loading Spinner */
+    .loading {
+        text-align: center;
+        padding: 10px;
+        color: #999;
+    }
+    .spinner {
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #128c7e;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Online Users */
+    .online-users {
+        position: fixed;
+        top: 50px;
+        right: 10px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        padding: 10px;
+        z-index: 5;
+        display: none;
+        max-width: 200px;
+    }
+    .user-item {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+    }
+    .user-dot {
+        width: 8px;
+        height: 8px;
+        background: #25d366;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    /* Modal improvements */
     #nameModal {
         display: none; 
         position: fixed;
@@ -184,8 +374,7 @@
         font-size: 16px;
     }
     #submitName {
-        /* WhatsApp Green for Button */
-        background-color: #128c7e; 
+        background-color: #128c7e;
         color: white;
         padding: 10px 20px;
         border: none;
@@ -201,7 +390,8 @@
 </head>
 <body>
   
-  <div id="nameModal" style="display: none;">
+  <!-- Name Modal -->
+  <div id="nameModal">
     <div class="modal-content">
       <h2>🛡️ONLY CHAT NO SPAM🛡️</h2>
       <p>Enter Real Name ? (Enter your Real name to continue)</p>
@@ -210,29 +400,81 @@
     </div>
   </div>
 
+  <!-- Chat Header with new features -->
   <div class="chat-header">
-    ZB WhatsApp 
-    <span id="otherUserStatus" class="status-dot"></span>
-    <span id="statusText" style="font-size: 14px; margin-left: 5px;">Only For Messages</span>
+    <div class="header-left">
+      ZB WhatsApp Pro
+      <span id="otherUserStatus" class="status-dot"></span>
+      <span id="statusText" style="font-size: 14px; margin-left: 5px;">Only For Messages</span>
+    </div>
+    <div>
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+      <button class="icon-button" id="onlineUsersBtn">👥</button>
+    </div>
   </div>
 
+  <!-- Online Users List -->
+  <div class="online-users" id="onlineUsers">
+    <h4>Online Users</h4>
+    <div id="usersList"></div>
+  </div>
+
+  <!-- Chat Container -->
   <div class="chat-container" id="messages">
+    <div class="loading" id="loadingMessages">
+      <div class="spinner"></div>Loading messages...
+    </div>
   </div>
 
-  <div id="contextMenu" class="context-menu">
-    <div class="context-menu-item" id="deleteOption">Delete Message</div>
+  <!-- Typing Indicator -->
+  <div class="typing-indicator" id="typingIndicator">
+    Someone is typing...
   </div>
 
+  <!-- Reply Preview -->
+  <div class="reply-preview" id="replyPreview">
+    <span class="cancel-reply" id="cancelReply">✕</span>
+    <div class="reply-sender" id="replySender"></div>
+    <div id="replyText"></div>
+  </div>
+
+  <!-- Enhanced Input Area - FIXED -->
   <div class="input-area">
+    <div class="input-left">
+      <button class="icon-button" id="emojiBtn">😊</button>
+      <button class="icon-button" id="fileBtn">📎</button>
+      <input type="file" id="fileUpload" class="file-upload" accept="image/*,video/*,.pdf,.doc,.docx">
+    </div>
+    
     <input type="text" id="messageInput" placeholder="Type a message...">
-    <button id="sendButton">➤</button>
+    
+    <div class="input-right">
+      <button class="icon-button" id="voiceBtn">🎤</button>
+      <button id="sendButton">➤</button>
+    </div>
   </div>
-  
+
+  <!-- Emoji Picker -->
+  <div class="emoji-picker" id="emojiPicker">
+    <!-- Emojis will be added here by JavaScript -->
+  </div>
+
+  <!-- Context Menu -->
+  <div id="contextMenu" class="context-menu">
+    <div class="context-menu-item reply-option" id="replyOption">Reply</div>
+    <div class="context-menu-item edit-option" id="editOption">Edit</div>
+    <div class="context-menu-item forward-option" id="forwardOption">Forward</div>
+    <div class="context-menu-item delete-option" id="deleteOption">Delete</div>
+  </div>
+
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>                                                             
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>                                                                  
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+
   <script>
-                                   
+    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyB8zMhCjGxmHBpruABYA4pBj3jU0uMHCs0",
       authDomain: "zafi-chat-app.firebaseapp.com",
@@ -247,51 +489,566 @@
     const app = firebase.initializeApp(firebaseConfig);
     const database = app.database();
     const auth = app.auth();
+    const storage = app.storage();
                                                  
     let currentUserId = null;
     let currentUserName = null; 
-    let otherUserId = null; 
+    let otherUserId = null;
+    let isDarkTheme = false;
+    let replyToMessage = null;
+    let editMessageKey = null;
+    let typingTimer = null;
     
-    // --- MODAL ELEMENTS ---
+    // DOM Elements
     const nameModal = document.getElementById('nameModal');
     const nameInput = document.getElementById('nameInput');
     const submitNameButton = document.getElementById('submitName');
-    
-    // --- FIREBASE REFERENCES ---
     const messagesRef = database.ref('messages');
     const messagesDiv = document.getElementById('messages');
     const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
     const contextMenu = document.getElementById('contextMenu');
-    const deleteOption = document.getElementById('deleteOption');
+    const loadingMessages = document.getElementById('loadingMessages');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const replyPreview = document.getElementById('replyPreview');
+    const replySender = document.getElementById('replySender');
+    const replyText = document.getElementById('replyText');
+    const cancelReply = document.getElementById('cancelReply');
+    const emojiPicker = document.getElementById('emojiPicker');
+    const emojiBtn = document.getElementById('emojiBtn');
+    const fileBtn = document.getElementById('fileBtn');
+    const fileUpload = document.getElementById('fileUpload');
+    const voiceBtn = document.getElementById('voiceBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    const onlineUsersBtn = document.getElementById('onlineUsersBtn');
+    const onlineUsers = document.getElementById('onlineUsers');
+    const usersList = document.getElementById('usersList');
 
+    // Emoji Array
+    const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
+
+    // Initialize Emoji Picker
+    function initEmojiPicker() {
+        emojis.forEach(emoji => {
+            const emojiElement = document.createElement('span');
+            emojiElement.className = 'emoji';
+            emojiElement.textContent = emoji;
+            emojiElement.addEventListener('click', () => {
+                messageInput.value += emoji;
+                messageInput.focus();
+            });
+            emojiPicker.appendChild(emojiElement);
+        });
+    }
+
+    // Theme Toggle
+    themeToggle.addEventListener('click', () => {
+        isDarkTheme = !isDarkTheme;
+        document.body.classList.toggle('dark-theme', isDarkTheme);
+        themeToggle.textContent = isDarkTheme ? '☀️' : '🌙';
+    });
+
+    // Online Users Toggle
+    onlineUsersBtn.addEventListener('click', () => {
+        onlineUsers.style.display = onlineUsers.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Typing Indicator
+    messageInput.addEventListener('input', () => {
+        if (!currentUserId) return;
+        
+        // Send typing start
+        database.ref('typing/' + currentUserId).set({
+            typing: true,
+            name: currentUserName,
+            timestamp: Date.now()
+        });
+        
+        // Clear previous timer
+        if (typingTimer) clearTimeout(typingTimer);
+        
+        // Set timer to stop typing after 2 seconds
+        typingTimer = setTimeout(() => {
+            database.ref('typing/' + currentUserId).set({
+                typing: false,
+                name: currentUserName,
+                timestamp: Date.now()
+            });
+        }, 2000);
+    });
+
+    // Listen for typing
+    function setupTypingListener() {
+        database.ref('typing').on('value', (snapshot) => {
+            let someoneTyping = false;
+            let typers = [];
+            
+            snapshot.forEach((childSnapshot) => {
+                const typingData = childSnapshot.val();
+                if (typingData.typing && childSnapshot.key !== currentUserId) {
+                    someoneTyping = true;
+                    typers.push(typingData.name);
+                }
+            });
+            
+            if (someoneTyping) {
+                typingIndicator.textContent = typers.join(', ') + (typers.length === 1 ? ' is typing...' : ' are typing...');
+                typingIndicator.style.display = 'block';
+            } else {
+                typingIndicator.style.display = 'none';
+            }
+        });
+    }
+
+    // File Upload
+    fileBtn.addEventListener('click', () => {
+        fileUpload.click();
+    });
+
+    fileUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            uploadFile(file);
+        }
+    });
+
+    function uploadFile(file) {
+        const storageRef = storage.ref('chat_files/' + Date.now() + '_' + file.name);
+        const uploadTask = storageRef.put(file);
+        
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                // Progress handling can be added here
+            },
+            (error) => {
+                console.error("Upload error:", error);
+                alert("File upload failed.");
+            },
+            () => {
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    sendMessage('', downloadURL, file.type.startsWith('image/') ? 'image' : 'file');
+                });
+            }
+        );
+    }
+
+    // Voice Message (Basic Implementation)
+    let mediaRecorder;
+    let audioChunks = [];
     
-    // --- MAIN SIGN-IN LOGIC ---
-    // Jaise hi file load ho, sign-in start ho jaye.
-    auth.signInAnonymously()
-      .then(async (userCredential) => {
-        currentUserId = userCredential.user.uid;
-        console.log("Current User ID:", currentUserId);
-        
-        const userRef = database.ref('users/' + currentUserId);
-        const nameSnapshot = await userRef.child('displayName').once('value');
-        
-        if (nameSnapshot.exists()) {
-            // Agar naam pehle se save hai, toh use karo aur chat shuru karo.
-            currentUserName = nameSnapshot.val();
-            setupUserStatus(currentUserId);
-            startMessageListener(); 
-        } else {
-            // Agar naam save nahi hai, toh stylish modal dikhao aur chat rok do.
-            nameModal.style.display = 'flex';
-            nameInput.focus(); 
+    voiceBtn.addEventListener('mousedown', startRecording);
+    voiceBtn.addEventListener('mouseup', stopRecording);
+    voiceBtn.addEventListener('touchstart', startRecording);
+    voiceBtn.addEventListener('touchend', stopRecording);
+
+    function startRecording(e) {
+        e.preventDefault();
+        if (!navigator.mediaDevices) {
+            alert("Voice recording not supported in this browser");
+            return;
         }
         
-      })
-      .catch((error) => {
-        console.error("Sign-in error:", error);
-      });
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                audioChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                
+                mediaRecorder.addEventListener("dataavailable", event => {
+                    audioChunks.push(event.data);
+                });
+                
+                voiceBtn.style.color = '#c0392b'; // Red when recording
+            })
+            .catch(error => {
+                console.error("Error accessing microphone:", error);
+            });
+    }
 
-    // --- MODAL SUBMIT LOGIC ---
+    function stopRecording(e) {
+        e.preventDefault();
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            
+            mediaRecorder.addEventListener("stop", () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                uploadAudio(audioBlob);
+                voiceBtn.style.color = '#54656f';
+            });
+        }
+    }
+
+    function uploadAudio(audioBlob) {
+        const storageRef = storage.ref('voice_messages/' + Date.now() + '.wav');
+        const uploadTask = storageRef.put(audioBlob);
+        
+        uploadTask.then((snapshot) => {
+            return snapshot.ref.getDownloadURL();
+        }).then((downloadURL) => {
+            sendMessage('🎤 Voice message', downloadURL, 'audio');
+        }).catch((error) => {
+            console.error("Voice upload error:", error);
+        });
+    }
+
+    // Enhanced Send Message Function
+    function sendMessage(text = null, fileUrl = null, messageType = 'text') {
+        const messageText = text || messageInput.value;
+        
+        if ((!messageText.trim() && !fileUrl) || !currentUserId || !currentUserName) {
+            if (!currentUserName) {
+                nameModal.style.display = 'flex';
+                nameInput.focus();
+            }
+            return;
+        }
+        
+        const messageData = {
+            text: messageText,
+            senderId: currentUserId,
+            senderName: currentUserName,
+            timestamp: Date.now(),
+            type: messageType,
+            read: false
+        };
+        
+        if (fileUrl) {
+            messageData.fileUrl = fileUrl;
+        }
+        
+        if (replyToMessage) {
+            messageData.replyTo = replyToMessage;
+        }
+        
+        if (editMessageKey) {
+            // Editing existing message
+            messagesRef.child(editMessageKey).update({
+                text: messageText,
+                edited: true,
+                editTimestamp: Date.now()
+            });
+            editMessageKey = null;
+        } else {
+            // Sending new message
+            messagesRef.push(messageData);
+        }
+        
+        // Clear inputs
+        messageInput.value = '';
+        cancelReply.click();
+        fileUpload.value = '';
+        
+        // Stop typing
+        if (typingTimer) {
+            clearTimeout(typingTimer);
+            database.ref('typing/' + currentUserId).set({
+                typing: false,
+                name: currentUserName,
+                timestamp: Date.now()
+            });
+        }
+    }
+
+    // Enhanced Message Display
+    function startMessageListener() {
+        messagesRef.on('value', (snapshot) => {
+            messagesDiv.innerHTML = '';
+            loadingMessages.style.display = 'none';
+            
+            snapshot.forEach((childSnapshot) => {
+                const message = childSnapshot.val();
+                const messageKey = childSnapshot.key;
+                const isSentByMe = (message.senderId === currentUserId);
+                
+                displayMessage(message, messageKey, isSentByMe);
+            });
+            
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            // Mark messages as read
+            markMessagesAsRead();
+        });
+    }
+
+    function displayMessage(message, messageKey, isSentByMe) {
+        const senderName = message.senderName || (isSentByMe ? "You" : "Unknown");
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', isSentByMe ? 'sent' : 'received');
+        
+        const time = new Date(message.timestamp || Date.now()).toLocaleTimeString([], { 
+            hour: '2-digit', minute: '2-digit' 
+        });
+        
+        let messageContent = '';
+        
+        // Reply preview for replied messages
+        if (message.replyTo) {
+            messageContent += `
+                <div style="background: #f0f0f0; padding: 5px; border-radius: 5px; margin-bottom: 5px; border-left: 3px solid #128c7e;">
+                    <small style="color: #128c7e; font-weight: bold;">${message.replyTo.senderName}</small><br>
+                    <small>${message.replyTo.text || 'File'}</small>
+                </div>
+            `;
+        }
+        
+        // Message content based on type
+        if (message.type === 'image') {
+            messageContent += `<img src="${message.fileUrl}" class="file-preview" alt="Image"><br>${message.text}`;
+        } else if (message.type === 'audio') {
+            messageContent += `🎤 Voice message<br><audio controls src="${message.fileUrl}" style="width: 200px; margin-top: 5px;"></audio>`;
+        } else if (message.type === 'file') {
+            messageContent += `📎 File<br><a href="${message.fileUrl}" target="_blank">Download File</a><br>${message.text}`;
+        } else {
+            messageContent += message.text;
+        }
+        
+        // Edited indicator
+        const editedIndicator = message.edited ? ' <small style="color: #999;">(edited)</small>' : '';
+        
+        // Read receipt (double tick)
+        const readReceipt = isSentByMe ? 
+            `<span class="timestamp-tick ${message.read ? 'double-tick' : ''}">${time} ${message.read ? '✓✓' : '✓'}</span>` :
+            `<span class="timestamp-tick">${time}</span>`;
+        
+        messageElement.innerHTML = `
+            <span class="sender-name">${senderName}</span>
+            ${messageContent}
+            ${readReceipt}
+            ${editedIndicator}
+        `;
+        
+        // Context menu for messages
+        messageElement.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            showContextMenu(e, messageKey, message, isSentByMe);
+        });
+        
+        // Long press for mobile
+        let pressTimer;
+        messageElement.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            pressTimer = setTimeout(() => {
+                showContextMenu(e, messageKey, message, isSentByMe);
+            }, 800);
+        });
+        
+        messageElement.addEventListener('touchend', () => {
+            clearTimeout(pressTimer);
+        });
+        
+        messageElement.addEventListener('touchmove', () => {
+            clearTimeout(pressTimer);
+        });
+        
+        messagesDiv.appendChild(messageElement);
+    }
+
+    // Enhanced Context Menu
+    function showContextMenu(e, key, message, isSentByMe) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Update context menu options based on message ownership
+        document.getElementById('editOption').style.display = isSentByMe ? 'block' : 'none';
+        document.getElementById('deleteOption').style.display = isSentByMe ? 'block' : 'none';
+        
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = e.clientX + 'px';
+        contextMenu.style.top = e.clientY + 'px';
+        
+        // Adjust position if near edges
+        if (e.clientX + contextMenu.offsetWidth > window.innerWidth) {
+            contextMenu.style.left = window.innerWidth - contextMenu.offsetWidth - 10 + 'px';
+        }
+        if (e.clientY + contextMenu.offsetHeight > window.innerHeight) {
+            contextMenu.style.top = window.innerHeight - contextMenu.offsetHeight - 10 + 'px';
+        }
+        
+        // Set up context menu actions
+        setupContextMenuActions(key, message, isSentByMe);
+    }
+
+    function setupContextMenuActions(key, message, isSentByMe) {
+        // Clear previous event listeners
+        const replyOption = document.getElementById('replyOption');
+        const editOption = document.getElementById('editOption');
+        const forwardOption = document.getElementById('forwardOption');
+        const deleteOption = document.getElementById('deleteOption');
+        
+        // Remove existing listeners
+        replyOption.replaceWith(replyOption.cloneNode(true));
+        editOption.replaceWith(editOption.cloneNode(true));
+        forwardOption.replaceWith(forwardOption.cloneNode(true));
+        deleteOption.replaceWith(deleteOption.cloneNode(true));
+        
+        // Get new references
+        const newReplyOption = document.getElementById('replyOption');
+        const newEditOption = document.getElementById('editOption');
+        const newForwardOption = document.getElementById('forwardOption');
+        const newDeleteOption = document.getElementById('deleteOption');
+        
+        // Reply action
+        newReplyOption.addEventListener('click', () => {
+            replyToMessage = {
+                key: key,
+                text: message.text,
+                senderName: message.senderName
+            };
+            replySender.textContent = message.senderName;
+            replyText.textContent = message.text || (message.type !== 'text' ? 'File' : 'Message');
+            replyPreview.style.display = 'block';
+            messageInput.focus();
+            contextMenu.style.display = 'none';
+        });
+        
+        // Edit action (only own messages)
+        if (isSentByMe) {
+            newEditOption.addEventListener('click', () => {
+                editMessageKey = key;
+                messageInput.value = message.text;
+                messageInput.focus();
+                contextMenu.style.display = 'none';
+            });
+        }
+        
+        // Forward action
+        newForwardOption.addEventListener('click', () => {
+            // Simple forward implementation
+            if (confirm("Forward this message?")) {
+                messagesRef.push({
+                    text: message.text,
+                    senderId: currentUserId,
+                    senderName: currentUserName,
+                    timestamp: Date.now(),
+                    forwarded: true,
+                    originalSender: message.senderName
+                });
+            }
+            contextMenu.style.display = 'none';
+        });
+        
+        // Delete action (only own messages)
+        if (isSentByMe) {
+            newDeleteOption.addEventListener('click', () => {
+                if (confirm("Delete this message?")) {
+                    messagesRef.child(key).remove()
+                        .then(() => {
+                            console.log("Message deleted:", key);
+                            contextMenu.style.display = 'none';
+                        })
+                        .catch((error) => {
+                            console.error("Error deleting message:", error);
+                            alert("Message delete nahi ho saka.");
+                        });
+                }
+            });
+        }
+    }
+
+    // Mark messages as read
+    function markMessagesAsRead() {
+        messagesRef.orderByChild('senderId').equalTo(otherUserId || 'zohaib_fixed_id').once('value', (snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                const message = childSnapshot.val();
+                if (!message.read) {
+                    messagesRef.child(childSnapshot.key).update({ read: true });
+                }
+            });
+        });
+    }
+
+    // Online Users Management
+    function setupOnlineUsers() {
+        const usersRef = database.ref('users');
+        const statusRef = database.ref('status');
+        
+        // Listen for online users
+        statusRef.on('value', (snapshot) => {
+            usersList.innerHTML = '';
+            snapshot.forEach((childSnapshot) => {
+                const status = childSnapshot.val();
+                if (status.state === 'online' && childSnapshot.key !== currentUserId) {
+                    // Get user name
+                    usersRef.child(childSnapshot.key).child('displayName').once('value', (nameSnapshot) => {
+                        const userName = nameSnapshot.val() || 'Unknown User';
+                        const userItem = document.createElement('div');
+                        userItem.className = 'user-item';
+                        userItem.innerHTML = `
+                            <span class="user-dot"></span>
+                            ${userName}
+                        `;
+                        usersList.appendChild(userItem);
+                    });
+                }
+            });
+        });
+    }
+
+    // Cancel Reply
+    cancelReply.addEventListener('click', () => {
+        replyPreview.style.display = 'none';
+        replyToMessage = null;
+    });
+
+    // Emoji Picker Toggle
+    emojiBtn.addEventListener('click', () => {
+        emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Close emoji picker when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+            emojiPicker.style.display = 'none';
+        }
+        if (!onlineUsersBtn.contains(e.target) && !onlineUsers.contains(e.target)) {
+            onlineUsers.style.display = 'none';
+        }
+        contextMenu.style.display = 'none';
+    });
+
+    // Send message on button click or Enter
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Initialize everything when page loads
+    window.addEventListener('load', () => {
+        initEmojiPicker();
+        
+        // Force send button to be visible
+        sendButton.style.display = 'flex';
+        sendButton.style.visibility = 'visible';
+        sendButton.style.opacity = '1';
+        
+        auth.signInAnonymously()
+            .then(async (userCredential) => {
+                currentUserId = userCredential.user.uid;
+                console.log("Current User ID:", currentUserId);
+                
+                const userRef = database.ref('users/' + currentUserId);
+                const nameSnapshot = await userRef.child('displayName').once('value');
+                
+                if (nameSnapshot.exists()) {
+                    currentUserName = nameSnapshot.val();
+                    setupUserStatus(currentUserId);
+                    setupTypingListener();
+                    setupOnlineUsers();
+                    startMessageListener();
+                } else {
+                    nameModal.style.display = 'flex';
+                    nameInput.focus();
+                }
+            })
+            .catch((error) => {
+                console.error("Sign-in error:", error);
+            });
+    });
+
+    // Name submission handler
     function handleNameSubmission() {
         let name = nameInput.value;
         
@@ -302,21 +1059,20 @@
         
         currentUserName = name.trim();
         const userRef = database.ref('users/' + currentUserId);
-        // Naam ko Firebase mein save kardo
+        
         userRef.child('displayName').set(currentUserName)
             .then(() => {
-                // Modal band kardo
                 nameModal.style.display = 'none';
                 console.log("Current User Name set:", currentUserName);
                 
-                // Naam save hotay hi chat shuru kardo
                 setupUserStatus(currentUserId);
+                setupTypingListener();
+                setupOnlineUsers();
                 startMessageListener();
             })
             .catch(error => console.error("Error saving name:", error));
     }
 
-    // Button click aur Enter key par naam submit karo
     submitNameButton.addEventListener('click', handleNameSubmission);
     nameInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
@@ -324,8 +1080,7 @@
         }
     });
 
-    
-    // --- NEW FEATURE 1: Online Status Logic ---
+    // User status setup (existing function)
     function setupUserStatus(uid) {
         const userStatusRef = database.ref('status/' + uid);
         const isOnline = { state: 'online', last_seen: firebase.database.ServerValue.TIMESTAMP };
@@ -335,8 +1090,7 @@
             userStatusRef.set(isOnline);
         });
 
-        // Other user ID is still hardcoded for status check 
-        otherUserId = 'zohaib_fixed_id'; 
+        otherUserId = 'zohaib_fixed_id';
         
         database.ref('status/' + otherUserId).on('value', (snapshot) => {
             const status = snapshot.val();
@@ -355,134 +1109,6 @@
                     text.textContent = 'Offline';
                 }
             }
-        });
-    }
-
-    // --- MESSAGE SEND/DELETE SETUP ---
-    document.getElementById('sendButton').addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
-
-    document.addEventListener('click', () => {
-        contextMenu.style.display = 'none';
-    });
-
-    function sendMessage() {
-      const messageText = messageInput.value;
-      
-      // Check for name/ID - agar naam set nahi toh message nahi bhejega
-      if (messageText.trim() === "" || !currentUserId || !currentUserName) {
-        if (!currentUserName) {
-            // Agar currentUserName null hai toh user ko modal dikha do
-            nameModal.style.display = 'flex';
-            nameInput.focus();
-        }
-        return;
-      }
-                                      
-      messagesRef.push({
-        text: messageText,
-        senderId: currentUserId,
-        senderName: currentUserName, 
-        timestamp: Date.now()
-      });
-      messageInput.value = '';
-    }
-    
-    // --- NEW FEATURE 2: Message Delete Logic ---
-    let messageKeyToDelete = null;
-
-    deleteOption.addEventListener('click', () => {
-        if (messageKeyToDelete) {
-            messagesRef.child(messageKeyToDelete).remove()
-                .then(() => {
-                    console.log("Message successfully deleted:", messageKeyToDelete);
-                    messageKeyToDelete = null; 
-                    contextMenu.style.display = 'none';
-                })
-                .catch((error) => {
-                    console.error("Error deleting message:", error);
-                    alert("Message delete nahi ho saka.");
-                });
-        }
-    });
-
-    function showContextMenu(e, key) {
-        e.preventDefault(); 
-        e.stopPropagation(); 
-
-        contextMenu.style.display = 'block';
-        
-        contextMenu.style.left = e.clientX + 'px';
-        contextMenu.style.top = e.clientY + 'px';
-        
-        if (e.clientX + contextMenu.offsetWidth > window.innerWidth) {
-            contextMenu.style.left = window.innerWidth - contextMenu.offsetWidth - 10 + 'px';
-        }
-        if (e.clientY + contextMenu.offsetHeight > window.innerHeight) {
-            contextMenu.style.top = window.innerHeight - contextMenu.offsetHeight - 10 + 'px';
-        }
-
-        messageKeyToDelete = key;
-    }
-
-    // --- Message Display Logic (CHANGE 2 APPLIED HERE) ---
-    function startMessageListener() {
-        messagesRef.on('value', (snapshot) => {
-            messagesDiv.innerHTML = '';
-            snapshot.forEach((childSnapshot) => {
-                const message = childSnapshot.val();
-                const messageKey = childSnapshot.key;
-                const isSentByMe = (message.senderId === currentUserId);
-                
-                const senderName = message.senderName || (isSentByMe ? "Unknown (Me)" : "Unknown (Other)");
-                
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', isSentByMe ? 'sent' : 'received');
-                
-                const time = new Date(message.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                // --- CHANGE 2: Timestamp for Received Messages ---
-                // Sent message ke liye pehle se hi tick ke saath time tha.
-                // Ab received message ke liye sirf time ka span add kar rahe hain.
-                const tickHtml = `<span class="timestamp-tick">${time}${isSentByMe ? ' ✓' : ''}</span>`; 
-                // Note: Agar aap double tick (✓✓) chahte hain toh ' ✓' ki jagah ' ✓✓' use kar sakte hain.
-                // Abhi sirf single tick rakha hai, received mein sirf time aayega.
-                // --- END CHANGE 2 ---
-                
-                messageElement.innerHTML = `
-                    <span class="sender-name">${senderName}</span>
-                    ${message.text}
-                    ${tickHtml}
-                `;
-                
-                // --- ADD DELETE EVENT LISTENERS ---
-                if (isSentByMe) {
-                    messageElement.addEventListener('contextmenu', (e) => {
-                        showContextMenu(e, messageKey);
-                    });
-                    
-                    let pressTimer;
-                    messageElement.addEventListener('touchstart', (e) => {
-                        e.stopPropagation(); 
-                        pressTimer = setTimeout(() => {
-                            showContextMenu(e, messageKey);
-                        }, 800); 
-                    });
-                    messageElement.addEventListener('touchend', () => {
-                        clearTimeout(pressTimer);
-                    });
-                    messageElement.addEventListener('touchmove', () => {
-                        clearTimeout(pressTimer);
-                    });
-                }
-                
-                messagesDiv.appendChild(messageElement);
-            });
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
     }
   </script>
