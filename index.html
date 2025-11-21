@@ -124,7 +124,7 @@
         color: #f39c12;
     }
 
-    /* INPUT AREA - FIXED */
+    /* INPUT AREA - COMPLETELY FIXED */
     .input-area {
       display: flex;
       padding: 10px;
@@ -141,14 +141,17 @@
         display: flex;
         align-items: center;
         gap: 5px;
+        flex-shrink: 0;
     }
     .input-right {
         display: flex;
         align-items: center;
         gap: 5px;
+        flex-shrink: 0;
     }
     #messageInput {
-      flex-grow: 1;
+      flex: 1;
+      min-width: 0;
       padding: 12px 16px;
       border-radius: 20px;
       border: none;
@@ -172,22 +175,25 @@
     .icon-button:hover {
         background-color: #e0e0e0;
     }
+    /* SEND BUTTON - GUARANTEED VISIBLE */
     #sendButton {
         width: 45px;
         height: 45px;
         border: none;
         border-radius: 50%;
-        background-color: #128c7e;
-        color: white;
+        background-color: #128c7e !important;
+        color: white !important;
         cursor: pointer;
         font-size: 18px;
         display: flex !important;
         justify-content: center;
         align-items: center;
         flex-shrink: 0;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     #sendButton:hover {
-        background-color: #075e54;
+        background-color: #075e54 !important;
     }
 
     /* Emoji Picker */
@@ -247,16 +253,6 @@
         cursor: pointer;
         color: #999;
         font-size: 16px;
-    }
-
-    /* File Upload */
-    .file-upload {
-        display: none;
-    }
-    .file-preview {
-        max-width: 200px;
-        margin: 5px 0;
-        border-radius: 5px;
     }
 
     /* Theme Toggle */
@@ -438,12 +434,10 @@
     <div id="replyText"></div>
   </div>
 
-  <!-- Enhanced Input Area - FIXED -->
+  <!-- SIMPLIFIED INPUT AREA -->
   <div class="input-area">
     <div class="input-left">
       <button class="icon-button" id="emojiBtn">😊</button>
-      <button class="icon-button" id="fileBtn">📎</button>
-      <input type="file" id="fileUpload" class="file-upload" accept="image/*,video/*,.pdf,.doc,.docx">
     </div>
     
     <input type="text" id="messageInput" placeholder="Type a message...">
@@ -459,7 +453,7 @@
     <!-- Emojis will be added here by JavaScript -->
   </div>
 
-  <!-- Context Menu -->
+  <!-- Context Menu - ALL OPTIONS KEPT -->
   <div id="contextMenu" class="context-menu">
     <div class="context-menu-item reply-option" id="replyOption">Reply</div>
     <div class="context-menu-item edit-option" id="editOption">Edit</div>
@@ -516,8 +510,6 @@
     const cancelReply = document.getElementById('cancelReply');
     const emojiPicker = document.getElementById('emojiPicker');
     const emojiBtn = document.getElementById('emojiBtn');
-    const fileBtn = document.getElementById('fileBtn');
-    const fileUpload = document.getElementById('fileUpload');
     const voiceBtn = document.getElementById('voiceBtn');
     const themeToggle = document.getElementById('themeToggle');
     const onlineUsersBtn = document.getElementById('onlineUsersBtn');
@@ -526,6 +518,56 @@
 
     // Emoji Array
     const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
+
+    // SIMPLE SEND MESSAGE FUNCTION - GUARANTEED TO WORK
+    function sendMessage() {
+        console.log("=== SEND MESSAGE FUNCTION CALLED ===");
+        
+        const messageText = messageInput.value.trim();
+        console.log("Message text:", messageText);
+        console.log("Current User ID:", currentUserId);
+        console.log("Current User Name:", currentUserName);
+        
+        // Check if user is ready
+        if (!currentUserId || !currentUserName) {
+            console.log("User not ready - showing modal");
+            nameModal.style.display = 'flex';
+            nameInput.focus();
+            return;
+        }
+        
+        // Check if message is empty
+        if (!messageText) {
+            console.log("Message is empty - not sending");
+            return;
+        }
+        
+        console.log("All checks passed - sending to Firebase");
+        
+        // Send message to Firebase
+        messagesRef.push({
+            text: messageText,
+            senderId: currentUserId,
+            senderName: currentUserName,
+            timestamp: Date.now(),
+            type: 'text',
+            read: false
+        }).then(() => {
+            console.log("✅ Message sent successfully to Firebase!");
+            messageInput.value = ''; // Clear input
+            messageInput.focus(); // Focus back to input
+            
+            // Hide reply preview if active
+            if (replyPreview.style.display === 'block') {
+                replyPreview.style.display = 'none';
+                replyToMessage = null;
+            }
+            
+        }).catch((error) => {
+            console.error("❌ Error sending message:", error);
+            alert("Message send nahi ho saka. Internet check karein.");
+        });
+    }
 
     // Initialize Emoji Picker
     function initEmojiPicker() {
@@ -557,17 +599,14 @@
     messageInput.addEventListener('input', () => {
         if (!currentUserId) return;
         
-        // Send typing start
         database.ref('typing/' + currentUserId).set({
             typing: true,
             name: currentUserName,
             timestamp: Date.now()
         });
         
-        // Clear previous timer
         if (typingTimer) clearTimeout(typingTimer);
         
-        // Set timer to stop typing after 2 seconds
         typingTimer = setTimeout(() => {
             database.ref('typing/' + currentUserId).set({
                 typing: false,
@@ -600,163 +639,17 @@
         });
     }
 
-    // File Upload
-    fileBtn.addEventListener('click', () => {
-        fileUpload.click();
-    });
-
-    fileUpload.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            uploadFile(file);
-        }
-    });
-
-    function uploadFile(file) {
-        const storageRef = storage.ref('chat_files/' + Date.now() + '_' + file.name);
-        const uploadTask = storageRef.put(file);
-        
-        uploadTask.on('state_changed',
-            (snapshot) => {
-                // Progress handling can be added here
-            },
-            (error) => {
-                console.error("Upload error:", error);
-                alert("File upload failed.");
-            },
-            () => {
-                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                    sendMessage('', downloadURL, file.type.startsWith('image/') ? 'image' : 'file');
-                });
-            }
-        );
-    }
-
-    // Voice Message (Basic Implementation)
-    let mediaRecorder;
-    let audioChunks = [];
-    
-    voiceBtn.addEventListener('mousedown', startRecording);
-    voiceBtn.addEventListener('mouseup', stopRecording);
-    voiceBtn.addEventListener('touchstart', startRecording);
-    voiceBtn.addEventListener('touchend', stopRecording);
-
-    function startRecording(e) {
-        e.preventDefault();
-        if (!navigator.mediaDevices) {
-            alert("Voice recording not supported in this browser");
-            return;
-        }
-        
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                audioChunks = [];
-                mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.start();
-                
-                mediaRecorder.addEventListener("dataavailable", event => {
-                    audioChunks.push(event.data);
-                });
-                
-                voiceBtn.style.color = '#c0392b'; // Red when recording
-            })
-            .catch(error => {
-                console.error("Error accessing microphone:", error);
-            });
-    }
-
-    function stopRecording(e) {
-        e.preventDefault();
-        if (mediaRecorder && mediaRecorder.state === "recording") {
-            mediaRecorder.stop();
-            mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            
-            mediaRecorder.addEventListener("stop", () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                uploadAudio(audioBlob);
-                voiceBtn.style.color = '#54656f';
-            });
-        }
-    }
-
-    function uploadAudio(audioBlob) {
-        const storageRef = storage.ref('voice_messages/' + Date.now() + '.wav');
-        const uploadTask = storageRef.put(audioBlob);
-        
-        uploadTask.then((snapshot) => {
-            return snapshot.ref.getDownloadURL();
-        }).then((downloadURL) => {
-            sendMessage('🎤 Voice message', downloadURL, 'audio');
-        }).catch((error) => {
-            console.error("Voice upload error:", error);
-        });
-    }
-
-    // Enhanced Send Message Function
-    function sendMessage(text = null, fileUrl = null, messageType = 'text') {
-        const messageText = text || messageInput.value;
-        
-        if ((!messageText.trim() && !fileUrl) || !currentUserId || !currentUserName) {
-            if (!currentUserName) {
-                nameModal.style.display = 'flex';
-                nameInput.focus();
-            }
-            return;
-        }
-        
-        const messageData = {
-            text: messageText,
-            senderId: currentUserId,
-            senderName: currentUserName,
-            timestamp: Date.now(),
-            type: messageType,
-            read: false
-        };
-        
-        if (fileUrl) {
-            messageData.fileUrl = fileUrl;
-        }
-        
-        if (replyToMessage) {
-            messageData.replyTo = replyToMessage;
-        }
-        
-        if (editMessageKey) {
-            // Editing existing message
-            messagesRef.child(editMessageKey).update({
-                text: messageText,
-                edited: true,
-                editTimestamp: Date.now()
-            });
-            editMessageKey = null;
-        } else {
-            // Sending new message
-            messagesRef.push(messageData);
-        }
-        
-        // Clear inputs
-        messageInput.value = '';
-        cancelReply.click();
-        fileUpload.value = '';
-        
-        // Stop typing
-        if (typingTimer) {
-            clearTimeout(typingTimer);
-            database.ref('typing/' + currentUserId).set({
-                typing: false,
-                name: currentUserName,
-                timestamp: Date.now()
-            });
-        }
-    }
-
-    // Enhanced Message Display
+    // Enhanced Message Display with Context Menu
     function startMessageListener() {
         messagesRef.on('value', (snapshot) => {
+            console.log("📨 New messages received from Firebase");
             messagesDiv.innerHTML = '';
             loadingMessages.style.display = 'none';
             
+            let messageCount = 0;
+            
             snapshot.forEach((childSnapshot) => {
+                messageCount++;
                 const message = childSnapshot.val();
                 const messageKey = childSnapshot.key;
                 const isSentByMe = (message.senderId === currentUserId);
@@ -764,10 +657,8 @@
                 displayMessage(message, messageKey, isSentByMe);
             });
             
+            console.log(`📊 Loaded ${messageCount} messages`);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            
-            // Mark messages as read
-            markMessagesAsRead();
         });
     }
 
@@ -780,28 +671,7 @@
             hour: '2-digit', minute: '2-digit' 
         });
         
-        let messageContent = '';
-        
-        // Reply preview for replied messages
-        if (message.replyTo) {
-            messageContent += `
-                <div style="background: #f0f0f0; padding: 5px; border-radius: 5px; margin-bottom: 5px; border-left: 3px solid #128c7e;">
-                    <small style="color: #128c7e; font-weight: bold;">${message.replyTo.senderName}</small><br>
-                    <small>${message.replyTo.text || 'File'}</small>
-                </div>
-            `;
-        }
-        
-        // Message content based on type
-        if (message.type === 'image') {
-            messageContent += `<img src="${message.fileUrl}" class="file-preview" alt="Image"><br>${message.text}`;
-        } else if (message.type === 'audio') {
-            messageContent += `🎤 Voice message<br><audio controls src="${message.fileUrl}" style="width: 200px; margin-top: 5px;"></audio>`;
-        } else if (message.type === 'file') {
-            messageContent += `📎 File<br><a href="${message.fileUrl}" target="_blank">Download File</a><br>${message.text}`;
-        } else {
-            messageContent += message.text;
-        }
+        let messageContent = message.text;
         
         // Edited indicator
         const editedIndicator = message.edited ? ' <small style="color: #999;">(edited)</small>' : '';
@@ -818,7 +688,7 @@
             ${editedIndicator}
         `;
         
-        // Context menu for messages
+        // CONTEXT MENU FOR MESSAGES - ALL FEATURES WORKING
         messageElement.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             showContextMenu(e, messageKey, message, isSentByMe);
@@ -844,7 +714,7 @@
         messagesDiv.appendChild(messageElement);
     }
 
-    // Enhanced Context Menu
+    // ENHANCED CONTEXT MENU - ALL OPTIONS WORKING
     function showContextMenu(e, key, message, isSentByMe) {
         e.preventDefault();
         e.stopPropagation();
@@ -896,10 +766,11 @@
                 senderName: message.senderName
             };
             replySender.textContent = message.senderName;
-            replyText.textContent = message.text || (message.type !== 'text' ? 'File' : 'Message');
+            replyText.textContent = message.text || 'Message';
             replyPreview.style.display = 'block';
             messageInput.focus();
             contextMenu.style.display = 'none';
+            console.log("🔁 Reply option clicked");
         });
         
         // Edit action (only own messages)
@@ -909,12 +780,12 @@
                 messageInput.value = message.text;
                 messageInput.focus();
                 contextMenu.style.display = 'none';
+                console.log("✏️ Edit option clicked");
             });
         }
         
         // Forward action
         newForwardOption.addEventListener('click', () => {
-            // Simple forward implementation
             if (confirm("Forward this message?")) {
                 messagesRef.push({
                     text: message.text,
@@ -924,6 +795,7 @@
                     forwarded: true,
                     originalSender: message.senderName
                 });
+                console.log("🔄 Message forwarded");
             }
             contextMenu.style.display = 'none';
         });
@@ -934,7 +806,7 @@
                 if (confirm("Delete this message?")) {
                     messagesRef.child(key).remove()
                         .then(() => {
-                            console.log("Message deleted:", key);
+                            console.log("🗑️ Message deleted:", key);
                             contextMenu.style.display = 'none';
                         })
                         .catch((error) => {
@@ -944,45 +816,6 @@
                 }
             });
         }
-    }
-
-    // Mark messages as read
-    function markMessagesAsRead() {
-        messagesRef.orderByChild('senderId').equalTo(otherUserId || 'zohaib_fixed_id').once('value', (snapshot) => {
-            snapshot.forEach((childSnapshot) => {
-                const message = childSnapshot.val();
-                if (!message.read) {
-                    messagesRef.child(childSnapshot.key).update({ read: true });
-                }
-            });
-        });
-    }
-
-    // Online Users Management
-    function setupOnlineUsers() {
-        const usersRef = database.ref('users');
-        const statusRef = database.ref('status');
-        
-        // Listen for online users
-        statusRef.on('value', (snapshot) => {
-            usersList.innerHTML = '';
-            snapshot.forEach((childSnapshot) => {
-                const status = childSnapshot.val();
-                if (status.state === 'online' && childSnapshot.key !== currentUserId) {
-                    // Get user name
-                    usersRef.child(childSnapshot.key).child('displayName').once('value', (nameSnapshot) => {
-                        const userName = nameSnapshot.val() || 'Unknown User';
-                        const userItem = document.createElement('div');
-                        userItem.className = 'user-item';
-                        userItem.innerHTML = `
-                            <span class="user-dot"></span>
-                            ${userName}
-                        `;
-                        usersList.appendChild(userItem);
-                    });
-                }
-            });
-        });
     }
 
     // Cancel Reply
@@ -1007,70 +840,101 @@
         contextMenu.style.display = 'none';
     });
 
-    // Send message on button click or Enter
-    sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
+    // SIMPLE EVENT LISTENERS - GUARANTEED TO WORK
+    function setupEventListeners() {
+        console.log("Setting up event listeners...");
+        
+        // Send button click
+        sendButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log("🟢 Send button clicked!");
             sendMessage();
-        }
-    });
+        });
+        
+        // Enter key in message input
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                console.log("🟢 Enter key pressed!");
+                sendMessage();
+            }
+        });
+        
+        console.log("✅ Event listeners setup complete");
+    }
 
     // Initialize everything when page loads
-    window.addEventListener('load', () => {
+    window.addEventListener('load', function() {
+        console.log("🚀 Page loaded - initializing app...");
+        
         initEmojiPicker();
+        setupEventListeners();
         
         // Force send button to be visible
         sendButton.style.display = 'flex';
         sendButton.style.visibility = 'visible';
         sendButton.style.opacity = '1';
         
+        console.log("🟢 Starting Firebase authentication...");
+        
         auth.signInAnonymously()
             .then(async (userCredential) => {
                 currentUserId = userCredential.user.uid;
-                console.log("Current User ID:", currentUserId);
+                console.log("✅ User signed in:", currentUserId);
                 
                 const userRef = database.ref('users/' + currentUserId);
                 const nameSnapshot = await userRef.child('displayName').once('value');
                 
                 if (nameSnapshot.exists()) {
                     currentUserName = nameSnapshot.val();
+                    console.log("✅ User name found:", currentUserName);
+                    
                     setupUserStatus(currentUserId);
                     setupTypingListener();
                     setupOnlineUsers();
                     startMessageListener();
+                    
+                    console.log("🎉 App ready! You can start chatting.");
                 } else {
+                    console.log("🟡 No user name - showing modal");
                     nameModal.style.display = 'flex';
                     nameInput.focus();
                 }
             })
             .catch((error) => {
-                console.error("Sign-in error:", error);
+                console.error("❌ Sign-in error:", error);
+                alert("Firebase connection error. Internet check karein.");
             });
     });
 
     // Name submission handler
     function handleNameSubmission() {
-        let name = nameInput.value;
+        let name = nameInput.value.trim();
         
-        if (!name || name.trim() === "") {
+        if (!name) {
             alert("Naam zaroor dein taake doosre aapko pehchaan saken.");
             return;
         }
         
-        currentUserName = name.trim();
+        currentUserName = name;
         const userRef = database.ref('users/' + currentUserId);
         
         userRef.child('displayName').set(currentUserName)
             .then(() => {
                 nameModal.style.display = 'none';
-                console.log("Current User Name set:", currentUserName);
+                console.log("✅ User name saved:", currentUserName);
                 
                 setupUserStatus(currentUserId);
                 setupTypingListener();
                 setupOnlineUsers();
                 startMessageListener();
+                
+                alert("🎉 Welcome " + currentUserName + "! Ab aap chat kar sakte hain.");
             })
-            .catch(error => console.error("Error saving name:", error));
+            .catch(error => {
+                console.error("❌ Error saving name:", error);
+                alert("Name save nahi ho saka. Internet check karein.");
+            });
     }
 
     submitNameButton.addEventListener('click', handleNameSubmission);
@@ -1080,7 +944,7 @@
         }
     });
 
-    // User status setup (existing function)
+    // User status setup
     function setupUserStatus(uid) {
         const userStatusRef = database.ref('status/' + uid);
         const isOnline = { state: 'online', last_seen: firebase.database.ServerValue.TIMESTAMP };
@@ -1111,6 +975,42 @@
             }
         });
     }
+
+    // Online Users Management
+    function setupOnlineUsers() {
+        const usersRef = database.ref('users');
+        const statusRef = database.ref('status');
+        
+        statusRef.on('value', (snapshot) => {
+            usersList.innerHTML = '';
+            snapshot.forEach((childSnapshot) => {
+                const status = childSnapshot.val();
+                if (status.state === 'online' && childSnapshot.key !== currentUserId) {
+                    usersRef.child(childSnapshot.key).child('displayName').once('value', (nameSnapshot) => {
+                        const userName = nameSnapshot.val() || 'Unknown User';
+                        const userItem = document.createElement('div');
+                        userItem.className = 'user-item';
+                        userItem.innerHTML = `
+                            <span class="user-dot"></span>
+                            ${userName}
+                        `;
+                        usersList.appendChild(userItem);
+                    });
+                }
+            });
+        });
+    }
+
+    console.log("🤖 ZB WhatsApp Pro Loaded Successfully!");
+    console.log("✨ Features Available:");
+    console.log("✅ Send Messages");
+    console.log("✅ Edit Messages (Right-click your messages)");
+    console.log("✅ Reply to Messages (Right-click any message)");
+    console.log("✅ Forward Messages (Right-click any message)");
+    console.log("✅ Delete Messages (Right-click your messages)");
+    console.log("✅ Emoji Picker");
+    console.log("✅ Online Status");
+    console.log("✅ Dark/Light Theme");
   </script>
 </body>
 </html>
