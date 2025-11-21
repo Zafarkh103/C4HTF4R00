@@ -334,7 +334,7 @@
     }
 
     /* Modal improvements */
-    #nameModal {
+    #nameModal, #roomModal {
         display: none; 
         position: fixed;
         left: 0;
@@ -360,7 +360,7 @@
         from { opacity: 0; transform: translateY(-20px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    #nameInput {
+    #nameInput, #roomPassword {
         width: 100%;
         padding: 10px;
         margin: 15px 0;
@@ -369,7 +369,7 @@
         box-sizing: border-box;
         font-size: 16px;
     }
-    #submitName {
+    #submitName, #submitRoom {
         background-color: #128c7e;
         color: white;
         padding: 10px 20px;
@@ -379,8 +379,59 @@
         font-size: 16px;
         transition: background-color 0.3s;
     }
-    #submitName:hover {
+    #submitName:hover, #submitRoom:hover {
         background-color: #075e54;
+    }
+
+    /* Chat Rooms Menu */
+    .rooms-menu {
+        position: fixed;
+        top: 50px;
+        right: 10px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        padding: 10px;
+        z-index: 5;
+        display: none;
+        max-width: 200px;
+    }
+    .room-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .room-item:hover {
+        background-color: #f0f0f0;
+    }
+    .room-lock {
+        color: #999;
+        font-size: 14px;
+    }
+
+    /* Chat Room Header */
+    .room-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: #075e54;
+        color: white;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    .room-name {
+        font-weight: bold;
+    }
+    .leave-room {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
     }
   </style>
 </head>
@@ -396,16 +447,56 @@
     </div>
   </div>
 
+  <!-- Room Password Modal -->
+  <div id="roomModal">
+    <div class="modal-content">
+      <h2>Chat Room Access</h2>
+      <p id="roomModalText">Enter password for Chatroom1</p>
+      <input type="password" id="roomPassword" placeholder="Enter password">
+      <button id="submitRoom">Join Room</button>
+    </div>
+  </div>
+
   <!-- Chat Header with new features -->
   <div class="chat-header">
     <div class="header-left">
-      ZB WhatsApp Pro
+      <span id="currentRoomName">ZB WhatsApp Pro</span>
       <span id="otherUserStatus" class="status-dot"></span>
       <span id="statusText" style="font-size: 14px; margin-left: 5px;">Only For Messages</span>
     </div>
     <div>
       <button class="theme-toggle" id="themeToggle">🌙</button>
+      <button class="icon-button" id="roomsBtn">⋮</button>
       <button class="icon-button" id="onlineUsersBtn">👥</button>
+    </div>
+  </div>
+
+  <!-- Chat Rooms Menu -->
+  <div class="rooms-menu" id="roomsMenu">
+    <h4>Chat Rooms</h4>
+    <div class="room-item" data-room="general" data-password="">
+      <span>General Chat</span>
+      <span class="room-lock">🔓</span>
+    </div>
+    <div class="room-item" data-room="Chatroom1" data-password="ZAFAR1">
+      <span>Chatroom 1</span>
+      <span class="room-lock">🔒</span>
+    </div>
+    <div class="room-item" data-room="Chatroom2" data-password="ZAFAR2">
+      <span>Chatroom 2</span>
+      <span class="room-lock">🔒</span>
+    </div>
+    <div class="room-item" data-room="Chatroom3" data-password="ZAFAR3">
+      <span>Chatroom 3</span>
+      <span class="room-lock">🔒</span>
+    </div>
+    <div class="room-item" data-room="Chatroom4" data-password="ZAFAR4">
+      <span>Chatroom 4</span>
+      <span class="room-lock">🔒</span>
+    </div>
+    <div class="room-item" data-room="Chatroom5" data-password="ZAFAR5">
+      <span>Chatroom 5</span>
+      <span class="room-lock">🔒</span>
     </div>
   </div>
 
@@ -492,11 +583,16 @@
     let replyToMessage = null;
     let editMessageKey = null;
     let typingTimer = null;
+    let currentRoom = 'general';
     
     // DOM Elements
     const nameModal = document.getElementById('nameModal');
+    const roomModal = document.getElementById('roomModal');
     const nameInput = document.getElementById('nameInput');
+    const roomPassword = document.getElementById('roomPassword');
+    const roomModalText = document.getElementById('roomModalText');
     const submitNameButton = document.getElementById('submitName');
+    const submitRoomButton = document.getElementById('submitRoom');
     const messagesRef = database.ref('messages');
     const messagesDiv = document.getElementById('messages');
     const messageInput = document.getElementById('messageInput');
@@ -515,6 +611,10 @@
     const onlineUsersBtn = document.getElementById('onlineUsersBtn');
     const onlineUsers = document.getElementById('onlineUsers');
     const usersList = document.getElementById('usersList');
+    const roomsBtn = document.getElementById('roomsBtn');
+    const roomsMenu = document.getElementById('roomsMenu');
+    const currentRoomName = document.getElementById('currentRoomName');
+    const roomItems = document.querySelectorAll('.room-item');
 
     // Emoji Array
     const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
@@ -545,7 +645,8 @@
         console.log("All checks passed - sending to Firebase");
         
         // Send message to Firebase
-        messagesRef.push({
+        const roomRef = database.ref('rooms/' + currentRoom + '/messages');
+        roomRef.push({
             text: messageText,
             senderId: currentUserId,
             senderName: currentUserName,
@@ -593,6 +694,13 @@
     // Online Users Toggle
     onlineUsersBtn.addEventListener('click', () => {
         onlineUsers.style.display = onlineUsers.style.display === 'block' ? 'none' : 'block';
+        roomsMenu.style.display = 'none';
+    });
+
+    // Rooms Menu Toggle
+    roomsBtn.addEventListener('click', () => {
+        roomsMenu.style.display = roomsMenu.style.display === 'block' ? 'none' : 'block';
+        onlineUsers.style.display = 'none';
     });
 
     // Typing Indicator
@@ -641,7 +749,9 @@
 
     // Enhanced Message Display with Context Menu
     function startMessageListener() {
-        messagesRef.on('value', (snapshot) => {
+        const roomRef = database.ref('rooms/' + currentRoom + '/messages');
+        
+        roomRef.on('value', (snapshot) => {
             console.log("📨 New messages received from Firebase");
             messagesDiv.innerHTML = '';
             loadingMessages.style.display = 'none';
@@ -787,7 +897,8 @@
         // Forward action
         newForwardOption.addEventListener('click', () => {
             if (confirm("Forward this message?")) {
-                messagesRef.push({
+                const roomRef = database.ref('rooms/' + currentRoom + '/messages');
+                roomRef.push({
                     text: message.text,
                     senderId: currentUserId,
                     senderName: currentUserName,
@@ -804,7 +915,8 @@
         if (isSentByMe) {
             newDeleteOption.addEventListener('click', () => {
                 if (confirm("Delete this message?")) {
-                    messagesRef.child(key).remove()
+                    const roomRef = database.ref('rooms/' + currentRoom + '/messages');
+                    roomRef.child(key).remove()
                         .then(() => {
                             console.log("🗑️ Message deleted:", key);
                             contextMenu.style.display = 'none';
@@ -836,6 +948,9 @@
         }
         if (!onlineUsersBtn.contains(e.target) && !onlineUsers.contains(e.target)) {
             onlineUsers.style.display = 'none';
+        }
+        if (!roomsBtn.contains(e.target) && !roomsMenu.contains(e.target)) {
+            roomsMenu.style.display = 'none';
         }
         contextMenu.style.display = 'none';
     });
@@ -1001,6 +1116,65 @@
         });
     }
 
+    // Chat Room Management
+    function setupChatRooms() {
+        roomItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const room = item.getAttribute('data-room');
+                const password = item.getAttribute('data-password');
+                
+                if (password) {
+                    // Show password modal for locked rooms
+                    roomModalText.textContent = `Enter password for ${room}`;
+                    roomModal.style.display = 'flex';
+                    roomPassword.value = '';
+                    roomPassword.focus();
+                    
+                    submitRoomButton.onclick = () => {
+                        if (roomPassword.value === password) {
+                            joinRoom(room);
+                            roomModal.style.display = 'none';
+                        } else {
+                            alert("❌ Galat password! Sahi password likhein.");
+                        }
+                    };
+                    
+                    roomPassword.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            if (roomPassword.value === password) {
+                                joinRoom(room);
+                                roomModal.style.display = 'none';
+                            } else {
+                                alert("❌ Galat password! Sahi password likhein.");
+                            }
+                        }
+                    });
+                } else {
+                    // No password required for general chat
+                    joinRoom(room);
+                }
+            });
+        });
+    }
+
+    function joinRoom(room) {
+        currentRoom = room;
+        currentRoomName.textContent = room;
+        
+        // Clear current messages
+        messagesDiv.innerHTML = '';
+        loadingMessages.style.display = 'block';
+        
+        // Start listening to messages in the new room
+        startMessageListener();
+        
+        console.log(`✅ Joined room: ${room}`);
+        roomsMenu.style.display = 'none';
+    }
+
+    // Initialize chat rooms
+    setupChatRooms();
+
     console.log("🤖 ZB WhatsApp Pro Loaded Successfully!");
     console.log("✨ Features Available:");
     console.log("✅ Send Messages");
@@ -1011,6 +1185,7 @@
     console.log("✅ Emoji Picker");
     console.log("✅ Online Status");
     console.log("✅ Dark/Light Theme");
+    console.log("✅ Chat Rooms with Passwords");
   </script>
 </body>
 </html>
