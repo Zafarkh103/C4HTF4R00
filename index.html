@@ -4,147 +4,64 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AnimeChat Pro - ZAFAR Rooms</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;padding:0;background:#000;color:#fff;width:100%;height:100vh;overflow:hidden}
+    body{font-family:Arial,sans-serif;margin:0;padding:0;background:#000;color:#fff;width:100%;height:100vh;overflow:hidden}
     .anime-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;background:#000 url('background.png') center/cover;opacity:0.5;filter:brightness(0.8) contrast(1.3) saturate(1.5)}
     .red-light{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at 20% 50%,rgba(255,45,45,0.4) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(255,20,20,0.3) 0%,transparent 50%);z-index:-1;mix-blend-mode:screen}
-    
-    /* HEADER IMPROVED */
-    .chat-header{position:fixed;top:0;width:100%;background:rgba(0,0,0,0.95);backdrop-filter:blur(20px);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(255,45,45,0.4);z-index:100;height:64px;box-sizing:border-box;box-shadow:0 5px 25px rgba(0,0,0,0.7)}
-    .header-left{display:flex;align-items:center;gap:15px}
-    .logo{width:44px;height:44px;border-radius:12px;overflow:hidden;border:3px solid #ff2d2d;background:linear-gradient(135deg,#ff2d2d,#b30000);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 0 25px rgba(255,45,45,0.8);animation:logoGlow 3s infinite alternate}
-    @keyframes logoGlow{0%{box-shadow:0 0 20px rgba(255,45,45,0.6)}100%{box-shadow:0 0 30px rgba(255,45,45,1)}}
-    .header-text h2{margin:0 0 3px 0;font-size:20px;color:#ff2d2d;text-shadow:0 0 15px rgba(255,45,45,0.8);font-weight:800;letter-spacing:0.5px}
-    .header-text small{font-size:12px;color:#25d366;font-weight:600;display:flex;align-items:center;gap:6px}
-    .online-dot{display:inline-block;width:8px;height:8px;background:#25d366;border-radius:50%;animation:pulse 2s infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.7;transform:scale(1.2)}}
-    
-    /* CHAT CONTAINER */
-    .chat-container{position:fixed;top:64px;bottom:116px;width:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:15px;box-sizing:border-box;scroll-behavior:smooth}
-    .messages{display:flex;flex-direction:column;gap:14px;min-height:100%}
-    
-    /* MESSAGES IMPROVED */
-    .message{max-width:78%;padding:16px 20px;border-radius:22px;position:relative;word-wrap:break-word;backdrop-filter:blur(10px);animation:fadeInUp 0.4s ease-out;border:1.5px solid rgba(255,255,255,0.15);box-shadow:0 6px 20px rgba(0,0,0,0.3)}
-    @keyframes fadeInUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-    .sent{align-self:flex-end;background:linear-gradient(135deg,#0084ff,#0066cc,#0044aa);color:#fff;border-bottom-right-radius:10px;box-shadow:0 6px 25px rgba(0,132,255,0.5);border:1.5px solid rgba(0,132,255,0.3)}
-    .received{align-self:flex-start;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.2);border-bottom-left-radius:10px}
-    .sender-name{font-size:13px;font-weight:700;margin-bottom:6px;opacity:0.95;display:flex;justify-content:space-between;align-items:center}
-    .sender-name .user-badge{display:flex;align-items:center;gap:8px}
-    .user-avatar-small{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#ff2d2d,#b30000);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;border:2px solid rgba(255,255,255,0.3)}
-    .message-time{font-size:11px;opacity:0.7;background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:10px}
-    
-    /* INPUT AREA IMPROVED - FILE SHARE BUTTON REMOVED */
-    .input-area{position:fixed;bottom:58px;width:100%;padding:15px 18px;background:rgba(0,0,0,0.97);backdrop-filter:blur(20px);border-top:2px solid rgba(255,45,45,0.3);display:flex;gap:12px;z-index:100;box-sizing:border-box;box-shadow:0 -5px 25px rgba(0,0,0,0.8)}
-    #messageInput{flex:1;padding:15px 22px;border-radius:28px;border:none;background:rgba(255,255,255,0.13);color:#fff;font-size:16px;outline:none;border:2px solid rgba(255,45,45,0.4);transition:all 0.3s;font-weight:500}
-    #messageInput::placeholder{color:rgba(255,255,255,0.6)}
-    #messageInput:focus{border-color:#ff2d2d;box-shadow:0 0 20px rgba(255,45,45,0.5);background:rgba(255,255,255,0.16)}
-    #sendButton{width:50px;height:50px;border-radius:50%;border:none;background:linear-gradient(135deg,#ff2d2d,#b30000);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(255,45,45,0.7);transition:all 0.3s;position:relative;overflow:hidden}
-    #sendButton:hover{transform:scale(1.08);box-shadow:0 8px 30px rgba(255,45,45,0.9)}
-    #sendButton:active{transform:scale(0.95)}
-    
-    /* HIDE ANY FILE UPLOAD BUTTONS */
-    .file-upload-btn, .upload-icon, input[type="file"] {
-      display: none !important;
-      width: 0 !important;
-      height: 0 !important;
-      opacity: 0 !important;
-      position: absolute !important;
-      pointer-events: none !important;
-    }
-    
-    /* NAV BAR IMPROVED */
-    .nav-bar{position:fixed;bottom:0;width:100%;background:rgba(0,0,0,0.98);backdrop-filter:blur(20px);display:flex;height:58px;border-top:2px solid rgba(255,45,45,0.3);z-index:100;box-shadow:0 -5px 25px rgba(0,0,0,0.9)}
-    .nav-item{flex:1;text-align:center;color:rgba(255,255,255,0.7);font-size:12px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;transition:all 0.3s;position:relative}
-    .nav-item:hover{color:rgba(255,255,255,0.9);background:rgba(255,45,45,0.05)}
-    .nav-item.active{color:#ff2d2d;text-shadow:0 0 15px rgba(255,45,45,0.8);background:rgba(255,45,45,0.1)}
-    .nav-item.active::after{content:'';position:absolute;bottom:0;left:25%;right:25%;height:3px;background:#ff2d2d;border-radius:3px 3px 0 0}
-    .nav-icon{font-size:24px;margin-bottom:4px;transition:all 0.3s}
-    .nav-item.active .nav-icon{transform:scale(1.15)}
-    
-    /* SIDEBARS IMPROVED */
-    .sidebar,.online-sidebar{position:fixed;top:0;width:300px;height:100%;background:rgba(0,0,0,0.99);backdrop-filter:blur(30px);z-index:1000;transition:transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);overflow-y:auto;padding:25px;box-sizing:border-box;box-shadow:0 0 50px rgba(0,0,0,0.9)}
-    .sidebar{left:0;transform:translateX(-100%);border-right:3px solid rgba(255,45,45,0.4)}
+    .chat-header{position:fixed;top:0;width:100%;background:rgba(0,0,0,0.9);backdrop-filter:blur(15px);padding:12px 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,45,45,0.3);z-index:100;height:60px;box-sizing:border-box}
+    .header-left{display:flex;align-items:center;gap:12px}
+    .logo{width:40px;height:40px;border-radius:10px;overflow:hidden;border:2px solid #ff2d2d;background:linear-gradient(135deg,#ff2d2d,#b30000);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 20px rgba(255,45,45,0.6)}
+    .header-text h2{margin:0;font-size:18px;color:#ff2d2d;text-shadow:0 0 10px rgba(255,45,45,0.5)}
+    .header-text small{font-size:12px;opacity:0.7}
+    .chat-container{position:fixed;top:60px;bottom:110px;width:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;box-sizing:border-box}
+    .messages{display:flex;flex-direction:column;gap:10px;min-height:100%}
+    .message{max-width:80%;padding:12px 16px;border-radius:18px;position:relative;word-wrap:break-word;backdrop-filter:blur(5px);animation:fadeIn 0.3s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .sent{align-self:flex-end;background:linear-gradient(135deg,#0084ff,#0066cc);color:#fff;border-bottom-right-radius:5px;box-shadow:0 5px 20px rgba(0,132,255,0.4)}
+    .received{align-self:flex-start;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-bottom-left-radius:5px}
+    .sender-name{font-size:12px;font-weight:bold;margin-bottom:4px;opacity:0.9;display:flex;justify-content:space-between;align-items:center}
+    .message-time{font-size:10px;opacity:0.6;margin-left:10px}
+    .message-actions{display:none;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);justify-content:flex-end}
+    .message-action-btn{background:none;border:none;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all 0.2s}
+    .message-action-btn:hover{background:rgba(255,255,255,0.1);color:#fff}
+    .input-area{position:fixed;bottom:50px;width:100%;padding:12px 15px;background:rgba(0,0,0,0.85);backdrop-filter:blur(15px);border-top:1px solid rgba(255,45,45,0.2);display:flex;gap:10px;z-index:100;box-sizing:border-box}
+    #messageInput{flex:1;padding:12px 18px;border-radius:24px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:14px;outline:none;border:1px solid rgba(255,45,45,0.3)}
+    #messageInput::placeholder{color:rgba(255,255,255,0.5)}
+    #sendButton{width:44px;height:44px;border-radius:50%;border:none;background:linear-gradient(135deg,#ff2d2d,#b30000);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 15px rgba(255,45,45,0.5)}
+    .nav-bar{position:fixed;bottom:0;width:100%;background:rgba(0,0,0,0.95);backdrop-filter:blur(15px);display:flex;height:50px;border-top:1px solid rgba(255,45,45,0.2);z-index:100}
+    .nav-item{flex:1;text-align:center;color:rgba(255,255,255,0.6);font-size:12px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center}
+    .nav-item.active{color:#ff2d2d;text-shadow:0 0 10px rgba(255,45,45,0.5)}
+    .nav-icon{font-size:20px;margin-bottom:2px}
+    .sidebar,.online-sidebar{position:fixed;top:0;width:280px;height:100%;background:rgba(0,0,0,0.98);backdrop-filter:blur(25px);z-index:1000;transition:transform 0.3s ease;overflow-y:auto;padding:20px;box-sizing:border-box}
+    .sidebar{left:0;transform:translateX(-100%);border-right:2px solid rgba(255,45,45,0.3)}
     .sidebar.show{transform:translateX(0)}
-    .online-sidebar{right:0;transform:translateX(100%);border-left:3px solid rgba(0,132,255,0.4)}
+    .online-sidebar{right:0;transform:translateX(100%);border-left:2px solid rgba(0,132,255,0.3)}
     .online-sidebar.show{transform:translateX(0)}
-    
-    /* CHATROOMS IMPROVED */
-    .chatroom{display:flex;align-items:center;gap:15px;padding:15px;margin-bottom:12px;background:rgba(255,255,255,0.06);border-radius:15px;cursor:pointer;transition:all 0.3s;border:2px solid transparent;position:relative}
-    .chatroom:hover{background:rgba(255,45,45,0.18);border-color:rgba(255,45,45,0.6);transform:translateX(5px)}
-    .chatroom.active{background:rgba(255,45,45,0.25);border-color:rgba(255,45,45,0.9);box-shadow:0 8px 25px rgba(255,45,45,0.3);transform:translateX(8px)}
-    .room-avatar{width:55px;height:55px;border-radius:12px;background:linear-gradient(135deg,#ff2d2d,#b30000);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;box-shadow:0 5px 15px rgba(255,45,45,0.5);border:2px solid rgba(255,255,255,0.2)}
-    .room-info h4{margin:0 0 5px 0;font-size:16px;display:flex;align-items:center;gap:8px}
-    .room-info small{font-size:11px;opacity:0.8;background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:10px;border:1px dashed rgba(255,255,255,0.2)}
-    
-    /* ONLINE USERS WITH PROFILE IMAGES */
-    .online-user{display:flex;align-items:center;gap:15px;padding:14px;margin-bottom:10px;background:rgba(255,255,255,0.07);border-radius:14px;border-left:4px solid #25d366;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1)}
-    .online-user:hover{background:rgba(37,211,102,0.15);transform:translateX(5px)}
-    .user-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0084ff,#0066cc);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px;border:3px solid rgba(255,255,255,0.3);box-shadow:0 5px 15px rgba(0,132,255,0.4);position:relative}
-    .user-avatar::after{content:'';position:absolute;bottom:2px;right:2px;width:12px;height:12px;background:#25d366;border-radius:50%;border:2px solid #000}
-    .user-info{flex:1}
-    .user-info strong{display:block;font-size:15px;margin-bottom:3px}
-    .user-info small{font-size:12px;opacity:0.8;display:flex;align-items:center;gap:5px}
-    .room-indicator{background:rgba(255,45,45,0.15);padding:2px 8px;border-radius:8px;font-size:10px;border:1px solid rgba(255,45,45,0.3)}
-    
-    /* STICKER MENU IMPROVED */
-    .sticker-menu{position:fixed;bottom:116px;left:12px;right:12px;background:rgba(0,0,0,0.99);border:3px solid rgba(255,45,45,0.6);border-radius:20px;z-index:1000;display:none;flex-direction:column;max-height:380px;box-shadow:0 15px 40px rgba(255,45,45,0.6);overflow:hidden}
-    .sticker-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:2px solid rgba(255,45,45,0.4);background:rgba(255,45,45,0.2);border-radius:20px 20px 0 0}
-    .sticker-header h3{margin:0;color:#ff2d2d;font-size:18px;text-shadow:0 0 15px rgba(255,45,45,0.8);font-weight:700}
-    .close-sticker-menu{background:none;border:none;color:#ff2d2d;font-size:24px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.3s}
-    .close-sticker-menu:hover{background:rgba(255,45,45,0.4);transform:rotate(90deg) scale(1.1)}
-    .sticker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:15px;padding:20px;overflow-y:auto}
-    .sticker-item{background:rgba(255,255,255,0.08);border-radius:16px;padding:14px;cursor:pointer;transition:all 0.3s;border:2px solid transparent;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-    .sticker-item:hover{background:rgba(255,45,45,0.25);border-color:rgba(255,45,45,0.9);transform:scale(1.12) rotate(2deg);box-shadow:0 10px 25px rgba(255,45,45,0.5)}
-    .sticker-item::after{content:attr(title);position:absolute;bottom:5px;left:0;right:0;font-size:10px;color:rgba(255,255,255,0.8);text-align:center;background:rgba(0,0,0,0.7);padding:3px;border-radius:5px;opacity:0;transition:opacity 0.3s}
-    .sticker-item:hover::after{opacity:1}
-    .sticker-item img{width:65px;height:65px;object-fit:contain;pointer-events:none;transition:transform 0.3s}
-    .sticker-item:hover img{transform:scale(1.1)}
-    .sticker-btn{background:linear-gradient(135deg,#ff2d2d,#b30000);color:#fff;border:none;border-radius:50%;width:46px;height:46px;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(255,45,45,0.7);transition:all 0.3s}
-    .sticker-btn:hover{transform:scale(1.1) rotate(10deg);box-shadow:0 10px 25px rgba(255,45,45,0.9)}
-    
-    /* MODALS IMPROVED */
-    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(15px);animation:modalFadeIn 0.3s ease}
-    @keyframes modalFadeIn{from{opacity:0;backdrop-filter:blur(0)}to{opacity:1;backdrop-filter:blur(15px)}}
-    .modal-content{background:rgba(15,5,10,0.99);padding:30px;border-radius:20px;width:90%;max-width:380px;border:3px solid rgba(255,45,45,0.6);box-shadow:0 0 50px rgba(255,45,45,0.4);text-align:center;animation:modalSlideUp 0.4s cubic-bezier(0.25,0.46,0.45,0.94)}
-    @keyframes modalSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-    .modal-content h2{margin:0 0 15px 0;color:#ff2d2d;font-size:26px;text-shadow:0 0 15px rgba(255,45,45,0.7)}
-    .modal-content p{color:rgba(255,255,255,0.9);margin-bottom:20px;font-size:15px}
-    .modal-content input{width:100%;padding:16px 20px;margin:18px 0;border-radius:14px;border:2px solid rgba(255,45,45,0.5);background:rgba(0,0,0,0.6);color:#fff;font-size:16px;box-sizing:border-box;transition:all 0.3s;font-weight:500}
-    .modal-content input:focus{border-color:#ff2d2d;box-shadow:0 0 20px rgba(255,45,45,0.5);background:rgba(0,0,0,0.7)}
-    .modal-content button{background:linear-gradient(135deg,#ff2d2d,#b30000);color:#fff;border:none;padding:16px 30px;border-radius:14px;font-size:16px;cursor:pointer;width:100%;margin-top:15px;box-shadow:0 6px 20px rgba(255,45,45,0.5);transition:all 0.3s;font-weight:600;letter-spacing:0.5px}
-    .modal-content button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(255,45,45,0.7)}
-    .modal-content button:active{transform:translateY(0)}
-    
-    /* SECRET CONTAINER */
-    .secret-container{position:fixed;top:75px;right:12px;background:rgba(0,0,0,0.99);padding:18px;border-radius:14px;border:3px solid #ff2d2d;display:none;box-shadow:0 0 35px rgba(255,45,45,0.4);max-width:270px;z-index:1000;animation:slideInRight 0.3s ease}
-    @keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-    
-    /* LOADING */
-    .loading{text-align:center;padding:25px;color:rgba(255,255,255,0.7);font-size:15px}
-    .loading::after{content:'...';animation:dots 1.5s infinite}
-    @keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%,100%{content:'...'}}
-    
-    /* RESPONSIVE */
-    @media (max-width:768px){
-      .sidebar,.online-sidebar{width:88%}
-      .chat-container{padding:12px}
-      .message{max-width:82%;padding:14px 18px}
-      .sticker-grid{grid-template-columns:repeat(4,1fr);gap:12px;padding:16px}
-      .sticker-item img{width:55px;height:55px}
-      .chat-header{padding:12px 15px;height:62px}
-      .header-text h2{font-size:18px}
-      .logo{width:40px;height:40px;font-size:22px}
-      .input-area{padding:14px 16px}
-      #messageInput{padding:14px 20px;font-size:15px}
-    }
-    @media (max-width:480px){
-      .sticker-grid{grid-template-columns:repeat(3,1fr)}
-      .header-text h2{font-size:16px}
-      .nav-icon{font-size:22px}
-      .user-avatar{width:42px;height:42px;font-size:18px}
-      .room-avatar{width:48px;height:48px;font-size:20px}
-    }
+    .chatroom{display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:10px;background:rgba(255,255,255,0.05);border-radius:12px;cursor:pointer;transition:0.3s;border:1px solid transparent}
+    .chatroom:hover{background:rgba(255,45,45,0.15);border-color:rgba(255,45,45,0.5)}
+    .chatroom.active{background:rgba(255,45,45,0.2);border-color:rgba(255,45,45,0.7);box-shadow:0 5px 15px rgba(255,45,45,0.2)}
+    .room-avatar{width:50px;height:50px;border-radius:10px;background:linear-gradient(135deg,#ff2d2d,#b30000);display:flex;align-items:center;justify-content:center;font-size:20px}
+    .online-user{display:flex;align-items:center;gap:12px;padding:10px;margin-bottom:8px;background:rgba(255,255,255,0.05);border-radius:10px;border-left:3px solid #25d366}
+    .user-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#0084ff,#0066cc);display:flex;align-items:center;justify-content:center;font-weight:bold}
+    .sticker-menu{position:fixed;bottom:110px;left:10px;right:10px;background:rgba(0,0,0,0.98);border:2px solid rgba(255,45,45,0.5);border-radius:15px;z-index:1000;display:none;flex-direction:column;max-height:350px;box-shadow:0 10px 30px rgba(255,45,45,0.4)}
+    .sticker-header{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid rgba(255,45,45,0.3);background:rgba(255,45,45,0.15);border-radius:15px 15px 0 0}
+    .sticker-header h3{margin:0;color:#ff2d2d;font-size:16px;text-shadow:0 0 10px rgba(255,45,45,0.5)}
+    .close-sticker-menu{background:none;border:none;color:#ff2d2d;font-size:20px;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.3s}
+    .close-sticker-menu:hover{background:rgba(255,45,45,0.3);transform:rotate(90deg)}
+    .sticker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:15px;overflow-y:auto}
+    .sticker-item{background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;cursor:pointer;transition:all 0.3s;border:2px solid transparent;display:flex;align-items:center;justify-content:center}
+    .sticker-item:hover{background:rgba(255,45,45,0.2);border-color:rgba(255,45,45,0.7);transform:scale(1.1);box-shadow:0 5px 15px rgba(255,45,45,0.3)}
+    .sticker-item img{width:60px;height:60px;object-fit:contain;pointer-events:none}
+    .sticker-btn{background:linear-gradient(135deg,#ff2d2d,#b30000);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 15px rgba(255,45,45,0.5);transition:all 0.3s}
+    .sticker-btn:hover{transform:scale(1.1);box-shadow:0 8px 20px rgba(255,45,45,0.7)}
+    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+    .modal-content{background:rgba(20,8,12,0.98);padding:25px;border-radius:15px;width:90%;max-width:350px;border:2px solid rgba(255,45,45,0.5);box-shadow:0 0 40px rgba(255,45,45,0.3);text-align:center}
+    .modal-content input{width:100%;padding:12px 15px;margin:15px 0;border-radius:10px;border:1px solid rgba(255,45,45,0.5);background:rgba(0,0,0,0.5);color:#fff;font-size:14px;box-sizing:border-box}
+    .modal-content button{background:linear-gradient(135deg,#ff2d2d,#b30000);color:#fff;border:none;padding:12px 25px;border-radius:10px;font-size:14px;cursor:pointer;width:100%;margin-top:10px;box-shadow:0 5px 15px rgba(255,45,45,0.3)}
+    .loading{text-align:center;padding:20px;color:rgba(255,255,255,0.6)}
+    .secret-container{position:fixed;top:70px;right:10px;background:rgba(0,0,0,0.98);padding:15px;border-radius:10px;border:2px solid #ff2d2d;display:none;box-shadow:0 0 30px rgba(255,45,45,0.3);max-width:250px;z-index:1000}
+    @media (max-width:768px){.sidebar,.online-sidebar{width:85%}.chat-container{padding:8px}.message{max-width:85%}.sticker-grid{grid-template-columns:repeat(4,1fr);gap:10px;padding:12px}.sticker-item img{width:50px;height:50px}}
+    @media (max-width:480px){.sticker-grid{grid-template-columns:repeat(3,1fr)}}
   </style>
 </head>
 <body>
@@ -153,90 +70,89 @@
   
   <div class="sticker-menu" id="stickerMenu">
     <div class="sticker-header">
-      <h3><i class="fas fa-sticky-note"></i> Anime Stickers Pack</h3>
+      <h3>🎌 Anime Stickers Pack</h3>
       <button class="close-sticker-menu" id="closeStickerMenu">✕</button>
     </div>
     <div class="sticker-grid" id="stickerGrid"></div>
   </div>
   
   <div class="secret-container" id="secretContainer">
-    <h4 style="margin:0 0 12px;color:#ff2d2d;text-align:center"><i class="fas fa-lock"></i> Secret Passwords</h4>
-    <div style="font-size:13px;line-height:1.7">
-      <div><strong><i class="fas fa-door-closed"></i> Room 1:</strong> <span id="secretPass1" style="color:#25d366;font-weight:bold">Loading...</span></div>
-      <div><strong><i class="fas fa-door-closed"></i> Room 2:</strong> <span id="secretPass2" style="color:#25d366;font-weight:bold">Loading...</span></div>
-      <div><strong><i class="fas fa-door-closed"></i> Room 3:</strong> <span id="secretPass3" style="color:#25d366;font-weight:bold">Loading...</span></div>
-      <div><strong><i class="fas fa-door-closed"></i> Room 4:</strong> <span id="secretPass4" style="color:#25d366;font-weight:bold">Loading...</span></div>
-      <div><strong><i class="fas fa-door-closed"></i> Room 5:</strong> <span id="secretPass5" style="color:#25d366;font-weight:bold">Loading...</span></div>
+    <h4 style="margin:0 0 10px;color:#ff2d2d;text-align:center">🔒 Secret Passwords</h4>
+    <div style="font-size:12px;line-height:1.6">
+      <div><strong>Room 1:</strong> <span id="secretPass1" style="color:#25d366">Loading...</span></div>
+      <div><strong>Room 2:</strong> <span id="secretPass2" style="color:#25d366">Loading...</span></div>
+      <div><strong>Room 3:</strong> <span id="secretPass3" style="color:#25d366">Loading...</span></div>
+      <div><strong>Room 4:</strong> <span id="secretPass4" style="color:#25d366">Loading...</span></div>
+      <div><strong>Room 5:</strong> <span id="secretPass5" style="color:#25d366">Loading...</span></div>
     </div>
-    <button onclick="hideSecretPanel()" style="margin-top:12px;background:#ff2d2d;color:#fff;border:none;padding:8px 15px;border-radius:10px;font-size:12px;cursor:pointer;width:100%;font-weight:600;transition:all 0.3s">Close <i class="fas fa-times"></i></button>
+    <button onclick="hideSecretPanel()" style="margin-top:10px;background:#ff2d2d;color:#fff;border:none;padding:5px 10px;border-radius:5px;font-size:10px;cursor:pointer;width:100%">Close</button>
   </div>
   
   <div class="chat-header">
     <div class="header-left">
-      <button id="menuBtn" style="background:none;border:none;color:#ff2d2d;font-size:24px;cursor:pointer;transition:all 0.3s" title="Rooms Menu"><i class="fas fa-bars"></i></button>
-      <div class="logo"><i class="fas fa-robot"></i></div>
+      <button id="menuBtn" style="background:none;border:none;color:#ff2d2d;font-size:22px;cursor:pointer">☰</button>
+      <div class="logo">🎌</div>
       <div class="header-text">
-        <h2><i class="fas fa-comment-dots"></i> AnimeChat Pro</h2>
-        <small><span class="online-dot"></span> <span id="onlineCount">0 online</span></small>
+        <h2>AnimeChat Pro</h2>
+        <small id="onlineCount">0 online</small>
       </div>
     </div>
-    <div id="roomNameDisplay" style="color:#ff2d2d;font-weight:bold;font-size:15px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(255,45,45,0.1);padding:6px 12px;border-radius:10px;border:1px solid rgba(255,45,45,0.3)">General Chat</div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <button id="onlineBtn" style="background:none;border:none;color:#25d366;font-size:22px;cursor:pointer;transition:all 0.3s" title="Online Users"><i class="fas fa-users"></i></button>
-      <button id="secretBtn" style="background:none;border:none;color:#ff2d2d;font-size:22px;cursor:pointer;transition:all 0.3s" title="Secret Passwords"><i class="fas fa-eye"></i></button>
+    <div id="roomNameDisplay" style="color:#ff2d2d;font-weight:bold;font-size:14px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">General Chat</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="onlineBtn" style="background:none;border:none;color:#25d366;font-size:18px;cursor:pointer">👥</button>
+      <button id="secretBtn" style="background:none;border:none;color:#ff2d2d;font-size:18px;cursor:pointer">👁️</button>
     </div>
   </div>
   
   <div class="chat-container" id="chatContainer">
-    <div class="messages" id="messages"><div class="loading" id="loading">Loading messages</div></div>
+    <div class="messages" id="messages"><div class="loading" id="loading">Loading messages...</div></div>
   </div>
   
   <div class="input-area">
-    <!-- ONLY STICKER BUTTON, INPUT AND SEND BUTTON - NO FILE UPLOAD -->
-    <button class="sticker-btn" id="stickerBtn" title="Stickers"><i class="fas fa-sticky-note"></i></button>
-    <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
-    <button id="sendButton" title="Send Message"><i class="fas fa-paper-plane"></i></button>
+    <button class="sticker-btn" id="stickerBtn">🎌</button>
+    <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off">
+    <button id="sendButton">➤</button>
   </div>
   
   <div class="nav-bar">
-    <div class="nav-item active" data-tab="chat"><div class="nav-icon"><i class="fas fa-comment-alt"></i></div><div>Chat</div></div>
-    <div class="nav-item" data-tab="rooms"><div class="nav-icon"><i class="fas fa-door-closed"></i></div><div>Rooms</div></div>
-    <div class="nav-item" data-tab="theme"><div class="nav-icon"><i class="fas fa-palette"></i></div><div>Theme</div></div>
-    <div class="nav-item" data-tab="online"><div class="nav-icon"><i class="fas fa-user-friends"></i></div><div><span id="onlineBadge">0</span> Online</div></div>
+    <div class="nav-item active" data-tab="chat"><div class="nav-icon">💬</div><div>Chat</div></div>
+    <div class="nav-item" data-tab="rooms"><div class="nav-icon">🔒</div><div>Rooms</div></div>
+    <div class="nav-item" data-tab="theme"><div class="nav-icon">🎨</div><div>Theme</div></div>
+    <div class="nav-item" data-tab="online"><div class="nav-icon">👥</div><div><span id="onlineBadge">0</span> Online</div></div>
   </div>
   
   <div class="sidebar" id="sidebar">
-    <h3 style="margin-top:0;color:#ff2d2d;text-align:center;font-size:22px"><i class="fas fa-lock"></i> Secret Rooms</h3>
-    <div class="chatroom active" data-room="general" data-bg="background.png"><div class="room-avatar"><i class="fas fa-globe"></i></div><div class="room-info"><h4>General Chat <span style="color:#25d366"><i class="fas fa-unlock"></i></span></h4><small>Public • Everyone welcome</small></div></div>
-    <div class="chatroom" data-room="Chatroom1" data-password="ZAFAR1" data-bg="bg1.png"><div class="room-avatar"><i class="fas fa-1"></i></div><div class="room-info"><h4>Secret Room 1 <span style="color:#ff2d2d"><i class="fas fa-lock"></i></span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.15);padding:4px 10px;border-radius:12px;border:2px dashed rgba(255,45,45,0.4)">Password Protected</small></div></div>
-    <div class="chatroom" data-room="Chatroom2" data-password="ZAFAR2" data-bg="bg2.png"><div class="room-avatar"><i class="fas fa-2"></i></div><div class="room-info"><h4>Secret Room 2 <span style="color:#ff2d2d"><i class="fas fa-lock"></i></span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.15);padding:4px 10px;border-radius:12px;border:2px dashed rgba(255,45,45,0.4)">Password Protected</small></div></div>
-    <div class="chatroom" data-room="Chatroom3" data-password="ZAFAR3" data-bg="bg3.png"><div class="room-avatar"><i class="fas fa-3"></i></div><div class="room-info"><h4>Secret Room 3 <span style="color:#ff2d2d"><i class="fas fa-lock"></i></span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.15);padding:4px 10px;border-radius:12px;border:2px dashed rgba(255,45,45,0.4)">Password Protected</small></div></div>
-    <div class="chatroom" data-room="Chatroom4" data-password="ZAFAR4" data-bg="bg4.png"><div class="room-avatar"><i class="fas fa-4"></i></div><div class="room-info"><h4>Secret Room 4 <span style="color:#ff2d2d"><i class="fas fa-lock"></i></span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.15);padding:4px 10px;border-radius:12px;border:2px dashed rgba(255,45,45,0.4)">Password Protected</small></div></div>
-    <div class="chatroom" data-room="Chatroom5" data-password="ZAFAR5" data-bg="bg5.png"><div class="room-avatar"><i class="fas fa-5"></i></div><div class="room-info"><h4>Secret Room 5 <span style="color:#ff2d2d"><i class="fas fa-lock"></i></span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.15);padding:4px 10px;border-radius:12px;border:2px dashed rgba(255,45,45,0.4)">Password Protected</small></div></div>
+    <h3 style="margin-top:0;color:#ff2d2d;text-align:center">🔒 Secret Rooms</h3>
+    <div class="chatroom active" data-room="general" data-bg="background.png"><div class="room-avatar">#0</div><div class="room-info"><h4>General Chat <span style="color:#25d366">🔓</span></h4><small>Public • Everyone welcome</small></div></div>
+    <div class="chatroom" data-room="Chatroom1" data-password="ZAFAR1" data-bg="bg1.png"><div class="room-avatar">#1</div><div class="room-info"><h4>Secret Room 1 <span style="color:#ff2d2d">🔒</span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.1);padding:2px 8px;border-radius:10px;border:1px dashed rgba(255,45,45,0.3)">Password Protected</small></div></div>
+    <div class="chatroom" data-room="Chatroom2" data-password="ZAFAR2" data-bg="bg2.png"><div class="room-avatar">#2</div><div class="room-info"><h4>Secret Room 2 <span style="color:#ff2d2d">🔒</span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.1);padding:2px 8px;border-radius:10px;border:1px dashed rgba(255,45,45,0.3)">Password Protected</small></div></div>
+    <div class="chatroom" data-room="Chatroom3" data-password="ZAFAR3" data-bg="bg3.png"><div class="room-avatar">#3</div><div class="room-info"><h4>Secret Room 3 <span style="color:#ff2d2d">🔒</span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.1);padding:2px 8px;border-radius:10px;border:1px dashed rgba(255,45,45,0.3)">Password Protected</small></div></div>
+    <div class="chatroom" data-room="Chatroom4" data-password="ZAFAR4" data-bg="bg4.png"><div class="room-avatar">#4</div><div class="room-info"><h4>Secret Room 4 <span style="color:#ff2d2d">🔒</span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.1);padding:2px 8px;border-radius:10px;border:1px dashed rgba(255,45,45,0.3)">Password Protected</small></div></div>
+    <div class="chatroom" data-room="Chatroom5" data-password="ZAFAR5" data-bg="bg5.png"><div class="room-avatar">#5</div><div class="room-info"><h4>Secret Room 5 <span style="color:#ff2d2d">🔒</span></h4><small style="color:#ff2d2d;background:rgba(255,45,45,0.1);padding:2px 8px;border-radius:10px;border:1px dashed rgba(255,45,45,0.3)">Password Protected</small></div></div>
   </div>
   
   <div class="online-sidebar" id="onlineSidebar">
-    <h3 style="margin-top:0;color:#25d366;text-align:center;font-size:22px"><i class="fas fa-users"></i> Online Users</h3>
-    <div id="onlineUsersList"><div class="loading">Loading users</div></div>
+    <h3 style="margin-top:0;color:#25d366;text-align:center">👥 Online Users</h3>
+    <div id="onlineUsersList"><div class="loading">Loading users...</div></div>
   </div>
   
   <div class="modal" id="nameModal">
     <div class="modal-content">
-      <h2><i class="fas fa-robot"></i> Welcome to AnimeChat</h2>
+      <h2>🎌 Welcome to AnimeChat</h2>
       <p>Enter your name to start chatting:</p>
-      <input type="text" id="nameInput" placeholder="Enter your name..." autocomplete="off" maxlength="20">
-      <button id="submitName"><i class="fas fa-rocket"></i> Start Chatting</button>
-      <p style="font-size:13px;margin-top:20px;opacity:0.8;line-height:1.6"><i class="fas fa-bolt" style="color:#ff2d2d"></i> Real-time Chat<br><i class="fas fa-lock" style="color:#ff2d2d"></i> 5 password protected rooms<br><i class="fas fa-sticky-note" style="color:#ff2d2d"></i> 10 FREE Anime Stickers<br><i class="fas fa-user-friends" style="color:#ff2d2d"></i> Live Online Users</p>
+      <input type="text" id="nameInput" placeholder="Enter your name..." autocomplete="off">
+      <button id="submitName">Start Chatting</button>
+      <p style="font-size:12px;margin-top:15px;opacity:0.7">🔥 Real-time Chat<br>🔒 5 password protected rooms<br>🎌 10 FREE Anime Stickers<br>👥 Live Online Users</p>
     </div>
   </div>
   
   <div class="modal" id="passwordModal">
     <div class="modal-content">
-      <h2><i class="fas fa-lock"></i> Password Required</h2>
+      <h2>🔒 Password Required</h2>
       <p id="roomPrompt">Enter password for this room:</p>
       <input type="password" id="passwordInput" placeholder="Enter password..." autocomplete="off">
-      <button id="submitPassword"><i class="fas fa-key"></i> Join Room</button>
-      <button id="cancelPassword" style="background:rgba(255,255,255,0.12);margin-top:8px"><i class="fas fa-times"></i> Cancel</button>
+      <button id="submitPassword">Join Room</button>
+      <button id="cancelPassword" style="background:rgba(255,255,255,0.1);margin-top:5px">Cancel</button>
     </div>
   </div>
 
@@ -273,21 +189,14 @@ const CONFIG = {
     appId: "1:989950346714:web:7bad7f8fae2a72ce0bace3",
     measurementId: "G-XW5MS2D2K7",
     databaseURL: "https://zafi-chat-app-default-rtdb.asia-southeast1.firebasedatabase.app"
-  },
-  
-  // NEW: Profile images for users
-  USER_IMAGES: [
-    "👤", "🐱", "🐉", "⚔️", "🛡️", "🎭", "👑", "🎮", "🎨", "🌟",
-    "🔥", "💧", "🌪️", "⚡", "🌙", "☀️", "⭐", "🌠", "🎪", "🎯"
-  ]
+  }
 };
 
 // ========== STATE ==========
 let currentUser = {
   name: '',
   id: '',
-  room: 'general',
-  profileIcon: '👤' // NEW: Profile icon
+  room: 'general'
 };
 
 let app = {
@@ -435,7 +344,6 @@ function sendSticker(stickerFile, stickerName) {
     stickerName: stickerName,
     senderId: currentUser.id,
     senderName: currentUser.name,
-    senderIcon: currentUser.profileIcon, // NEW: Add profile icon
     timestamp: Date.now()
   };
   
@@ -458,23 +366,11 @@ function sendSticker(stickerFile, stickerName) {
 
 // ========== MESSAGE SYSTEM ==========
 function initMessageSystem() {
-  elements.sendButton.addEventListener('click', function() {
-    // Button animation
-    this.style.transform = 'scale(0.95)';
-    setTimeout(() => {
-      this.style.transform = 'scale(1)';
-    }, 150);
-    sendMessage();
-  });
+  elements.sendButton.addEventListener('click', sendMessage);
   
   elements.messageInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      // Send button animation
-      elements.sendButton.style.transform = 'scale(0.95)';
-      setTimeout(() => {
-        elements.sendButton.style.transform = 'scale(1)';
-      }, 150);
       sendMessage();
     }
   });
@@ -496,7 +392,6 @@ function sendMessage() {
     text: text,
     senderId: currentUser.id,
     senderName: currentUser.name,
-    senderIcon: currentUser.profileIcon, // NEW: Add profile icon
     timestamp: Date.now(),
     type: 'text'
   };
@@ -550,8 +445,9 @@ function loadMessages() {
         messages.sort((a, b) => a.timestamp - b.timestamp);
         messages.forEach(msg => addMessageToUI(msg));
         
-        // FIXED: IMPROVED SCROLL TO BOTTOM
-        setTimeout(scrollToBottom, 200);
+        setTimeout(() => {
+          elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+        }, 100);
       } else {
         showSystemMessage(`Welcome to ${currentUser.room}! Be the first to send a message.`);
       }
@@ -564,61 +460,19 @@ function loadMessages() {
   }
 }
 
-// FIXED: IMPROVED SCROLL FUNCTION
-function scrollToBottom() {
-  const container = elements.chatContainer;
-  const messages = elements.messages;
-  
-  // Method 1: Direct scroll
-  container.scrollTop = container.scrollHeight;
-  
-  // Method 2: Force scroll after a delay
-  setTimeout(() => {
-    container.scrollTo({
-      top: container.scrollHeight,
-      behavior: 'smooth'
-    });
-  }, 100);
-  
-  // Method 3: Additional check
-  setTimeout(() => {
-    if (container.scrollTop + container.clientHeight < container.scrollHeight - 50) {
-      container.scrollTop = container.scrollHeight;
-    }
-  }, 300);
-}
-
 function showDemoMessages() {
   elements.loading.style.display = 'none';
   elements.messages.innerHTML = '';
   
   const demoMessages = [
-    { 
-      senderName: "System", 
-      senderIcon: "⚙️",
-      text: "Welcome to AnimeChat Pro!", 
-      timestamp: Date.now() - 60000 
-    },
-    { 
-      senderName: "Bot", 
-      senderIcon: "🤖",
-      text: "Connect to internet for real-time chat with other users!", 
-      timestamp: Date.now() - 30000 
-    },
-    { 
-      senderName: "Admin", 
-      senderIcon: "👑",
-      text: "Send messages, stickers & enjoy!", 
-      timestamp: Date.now() 
-    }
+    { senderName: "System", text: "Welcome to AnimeChat Pro!", timestamp: Date.now() - 60000 },
+    { senderName: "Bot", text: "Connect to internet for real-time chat with other users!", timestamp: Date.now() - 30000 },
+    { senderName: "Admin", text: "Send messages, stickers & enjoy!", timestamp: Date.now() }
   ];
   
   demoMessages.forEach(msg => {
     addMessageToUI(msg);
   });
-  
-  // FIXED: Scroll after demo messages
-  setTimeout(scrollToBottom, 500);
 }
 
 function addMessageToUI(message) {
@@ -630,17 +484,14 @@ function addMessageToUI(message) {
     hour: '2-digit', minute: '2-digit' 
   });
   
-  // NEW: Add profile icon to sender name
-  const senderIcon = message.senderIcon || CONFIG.USER_IMAGES[0];
-  
   let content = '';
   if (message.type === 'sticker') {
     content = `
-      <div style="text-align:center;padding:8px;">
+      <div style="text-align:center;padding:5px;">
         <img src="${message.stickerFile}" alt="${message.stickerName}" 
-             style="max-width:130px;max-height:130px;border-radius:12px;border:2px solid rgba(255,255,255,0.15);"
-             onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\"color:#ff2d2d;padding:12px;background:rgba(255,45,45,0.1);border-radius:12px;border:2px dashed rgba(255,45,45,0.3)\">🎌 ${message.stickerName}</div>';">
-        <div style="font-size:12px;opacity:0.8;margin-top:8px;background:rgba(255,255,255,0.07);padding:4px 10px;border-radius:12px;">${message.stickerName}</div>
+             style="max-width:120px;max-height:120px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);"
+             onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\"color:#ff2d2d;padding:10px;\">🎌 ${message.stickerName}</div>';">
+        <div style="font-size:11px;opacity:0.7;margin-top:5px;background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:10px;">${message.stickerName}</div>
       </div>
     `;
   } else {
@@ -649,40 +500,28 @@ function addMessageToUI(message) {
   
   messageDiv.innerHTML = `
     <div class="sender-name">
-      <div class="user-badge">
-        <div class="user-avatar-small">${senderIcon}</div>
-        <span>${message.senderName || 'Unknown'} ${isSentByMe ? '<span style="color:#25d366;font-size:10px">(You)</span>' : ''}</span>
-      </div>
+      <span>${message.senderName || 'Unknown'} ${isSentByMe ? '(You)' : ''}</span>
       <span class="message-time">${time}</span>
     </div>
-    <div style="font-size:15px;line-height:1.5;">${content}</div>
+    ${content}
   `;
   
   elements.messages.appendChild(messageDiv);
-  
-  // FIXED: IMPROVED AUTO SCROLL TO BOTTOM
-  setTimeout(scrollToBottom, 50);
 }
 
 function showSystemMessage(text) {
   const messageDiv = document.createElement('div');
   messageDiv.className = 'message received';
-  messageDiv.style.background = 'rgba(255, 45, 45, 0.12)';
-  messageDiv.style.border = '2px dashed rgba(255, 45, 45, 0.4)';
+  messageDiv.style.background = 'rgba(255, 45, 45, 0.1)';
+  messageDiv.style.border = '1px dashed rgba(255, 45, 45, 0.3)';
   messageDiv.innerHTML = `
     <div class="sender-name">
-      <div class="user-badge">
-        <div class="user-avatar-small" style="background:linear-gradient(135deg,#ff9500,#ff5500)">⚙️</div>
-        <span style="color:#ff2d2d;font-weight:bold;">System</span>
-      </div>
+      <span style="color:#ff2d2d;">⚙️ System</span>
       <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
     </div>
-    <div style="font-size:14px;color:rgba(255,255,255,0.9);">${text}</div>
+    ${text}
   `;
   elements.messages.appendChild(messageDiv);
-  
-  // FIXED: Scroll after system message
-  setTimeout(scrollToBottom, 100);
 }
 
 // ========== ROOM MANAGEMENT ==========
@@ -721,7 +560,7 @@ function showPasswordModal(roomName, requiredPassword, bgFile) {
 function switchRoom(roomName, bgFile) {
   console.log(`🚪 Switching to room: ${roomName}`);
   
-  elements.messages.innerHTML = '<div class="loading">Loading messages</div>';
+  elements.messages.innerHTML = '<div class="loading">Loading messages...</div>';
   
   currentUser.room = roomName;
   elements.roomNameDisplay.textContent = roomName;
@@ -750,11 +589,7 @@ function switchRoom(roomName, bgFile) {
 function initializeUser() {
   currentUser.id = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   
-  // NEW: Random profile icon for user
-  const randomIconIndex = Math.floor(Math.random() * CONFIG.USER_IMAGES.length);
-  currentUser.profileIcon = CONFIG.USER_IMAGES[randomIconIndex];
-  
-  console.log('✅ User registered:', currentUser.name, 'ID:', currentUser.id, 'Icon:', currentUser.profileIcon);
+  console.log('✅ User registered:', currentUser.name, 'ID:', currentUser.id);
   
   updateOnlineStatus();
   
@@ -776,8 +611,7 @@ function updateOnlineStatus() {
     online: true,
     lastSeen: Date.now(),
     room: currentUser.room,
-    userId: currentUser.id,
-    profileIcon: currentUser.profileIcon // NEW: Save profile icon
+    userId: currentUser.id
   });
   
   userStatusRef.onDisconnect().update({
@@ -785,7 +619,6 @@ function updateOnlineStatus() {
     lastSeen: Date.now()
   });
   
-  // Listen for other users
   app.database.ref('status').on('value', (snapshot) => {
     const users = [];
     let onlineCount = 0;
@@ -800,26 +633,20 @@ function updateOnlineStatus() {
       });
     }
     
-    // Update online counters
     elements.onlineBadge.textContent = onlineCount;
     elements.onlineCount.textContent = onlineCount + ' online';
     
-    // Update online users list WITH PROFILE IMAGES
     if (users.length === 0) {
       elements.onlineUsersList.innerHTML = '<div class="loading">No other users online</div>';
     } else {
       let html = '';
       users.forEach(user => {
-        const userIcon = user.profileIcon || CONFIG.USER_IMAGES[0];
         html += `
           <div class="online-user">
-            <div class="user-avatar">${userIcon}</div>
-            <div class="user-info">
-              <strong>${user.name}</strong>
-              <small>
-                <i class="fas fa-comment" style="color:#ff2d2d"></i> In: 
-                <span class="room-indicator">${user.room || 'general'}</span>
-              </small>
+            <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
+            <div>
+              <strong>${user.name}</strong><br>
+              <small>In: ${user.room || 'general'}</small>
             </div>
           </div>
         `;
@@ -844,7 +671,6 @@ function initSidebarSystem() {
     }
     
     elements.stickerMenu.style.display = 'none';
-    elements.secretContainer.style.display = 'none';
   }
   
   elements.menuBtn.addEventListener('click', () => toggleSidebar(elements.sidebar));
@@ -867,7 +693,6 @@ function initSecretPanel() {
     elements.secretContainer.style.display = isVisible ? 'none' : 'block';
     
     if (!isVisible) {
-      // FIXED: Show actual passwords
       document.getElementById('secretPass1').textContent = CONFIG.SECRET_PASSWORDS.Chatroom1;
       document.getElementById('secretPass2').textContent = CONFIG.SECRET_PASSWORDS.Chatroom2;
       document.getElementById('secretPass3').textContent = CONFIG.SECRET_PASSWORDS.Chatroom3;
@@ -885,7 +710,6 @@ function initSecretPanel() {
 
 // ========== EVENT LISTENERS ==========
 function initEventListeners() {
-  // NAME SUBMISSION - FIXED: Only ask new users
   document.getElementById('submitName').addEventListener('click', () => {
     currentUser.name = elements.nameInput.value.trim();
     if (!currentUser.name) {
@@ -893,11 +717,7 @@ function initEventListeners() {
     }
     
     if (currentUser.name) {
-      // Save name to localStorage
       localStorage.setItem('animechat_username', currentUser.name);
-      // Mark that user has entered name in THIS SESSION
-      sessionStorage.setItem('animechat_name_entered', 'true');
-      
       elements.nameModal.style.display = 'none';
       document.title = currentUser.name + ' - AnimeChat Pro';
       
@@ -919,7 +739,6 @@ function initEventListeners() {
     }
   });
   
-  // PASSWORD SUBMISSION
   document.getElementById('submitPassword').addEventListener('click', () => {
     const roomName = elements.passwordModal.dataset.room;
     const requiredPassword = elements.passwordModal.dataset.password;
@@ -947,7 +766,6 @@ function initEventListeners() {
     }
   });
   
-  // NAVIGATION
   elements.navItems.forEach(item => {
     item.addEventListener('click', () => {
       elements.navItems.forEach(nav => nav.classList.remove('active'));
@@ -977,7 +795,6 @@ function initEventListeners() {
     });
   });
   
-  // CHAT CONTAINER HEIGHT ADJUSTMENT
   function adjustChatHeight() {
     const headerHeight = document.querySelector('.chat-header').offsetHeight;
     const inputHeight = document.querySelector('.input-area').offsetHeight;
@@ -988,22 +805,15 @@ function initEventListeners() {
   
   adjustChatHeight();
   window.addEventListener('resize', adjustChatHeight);
-  window.addEventListener('orientationchange', adjustChatHeight);
-  
-  // FIXED: INITIAL SCROLL TO BOTTOM ON PAGE LOAD
-  setTimeout(scrollToBottom, 1000);
 }
 
 // ========== APP INITIALIZATION ==========
 async function initializeApp() {
   console.log('🚀 AnimeChat Pro LOADED');
   
-  // FIXED: Check if user already entered name in THIS SESSION
+  // CHECK IF USER ALREADY HAS A NAME SAVED
   const savedName = localStorage.getItem('animechat_username');
-  const nameEnteredThisSession = sessionStorage.getItem('animechat_name_entered');
-  
-  if (savedName && nameEnteredThisSession === 'true') {
-    // User already entered name in this session - NO MODAL
+  if (savedName) {
     currentUser.name = savedName;
     currentUser.id = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     document.title = currentUser.name + ' - AnimeChat Pro';
@@ -1020,13 +830,11 @@ async function initializeApp() {
     
     elements.nameModal.style.display = 'none';
   } else {
-    // NEW USER or FIRST TIME in this session - SHOW MODAL
     elements.nameModal.style.display = 'flex';
     elements.nameInput.focus();
     elements.nameInput.value = 'AnimeFan' + Math.floor(Math.random() * 1000);
   }
   
-  // Initialize all systems
   initStickerSystem();
   initSidebarSystem();
   initSecretPanel();
@@ -1042,13 +850,6 @@ document.addEventListener('DOMContentLoaded', initializeApp);
 
 window.hideSecretPanel = () => {
   elements.secretContainer.style.display = 'none';
-};
-
-// Utility function to clear session (for testing)
-window.clearChatSession = () => {
-  localStorage.removeItem('animechat_username');
-  sessionStorage.removeItem('animechat_name_entered');
-  location.reload();
 };
 </script>
 </body>
