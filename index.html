@@ -841,7 +841,8 @@ let app = {
   database: null,
   auth: null,
   onlineUsers: {},
-  typingUsers: {}
+  typingUsers: {},
+  currentMessageListener: null // Track current room listener
 };
 
 // ========== DOM ELEMENTS ==========
@@ -963,7 +964,7 @@ function sendSticker(stickerFile, stickerName) {
     return;
   }
   
-  console.log(`🇵🇰 Sending sticker: ${stickerName}`);
+  console.log(`🇵🇰 Sending sticker to ${currentUser.room}: ${stickerName}`);
   
   const messagesRef = app.database.ref('rooms/' + currentUser.room + '/messages');
   
@@ -1118,6 +1119,12 @@ function showPasswordModal(roomName, requiredPassword, bgFile) {
 function switchRoom(roomName, bgFile) {
   console.log(`🚪 Switching to room: ${roomName}`);
   
+  // IMPORTANT: Remove previous room listener
+  if (app.currentMessageListener && app.database) {
+    app.currentMessageListener.off(); // Detach previous listener
+    app.currentMessageListener = null;
+  }
+  
   // Clear current messages
   elements.messages.innerHTML = '<div class="loading">Loading messages...</div>';
   
@@ -1217,7 +1224,7 @@ function sendMessage() {
     return;
   }
   
-  console.log(`💬 Sending message: ${text.substring(0, 20)}...`);
+  console.log(`💬 Sending message to ${currentUser.room}: ${text.substring(0, 20)}...`);
   
   const messagesRef = app.database.ref('rooms/' + currentUser.room + '/messages');
   
@@ -1259,7 +1266,15 @@ function loadMessages() {
   
   const messagesRef = app.database.ref('rooms/' + currentUser.room + '/messages');
   
-  messagesRef.orderByChild('timestamp').limitToLast(100).on('value', (snapshot) => {
+  // Remove previous listener if exists
+  if (app.currentMessageListener) {
+    app.currentMessageListener.off();
+  }
+  
+  // Store the listener reference
+  app.currentMessageListener = messagesRef.orderByChild('timestamp').limitToLast(100);
+  
+  app.currentMessageListener.on('value', (snapshot) => {
     elements.loading.style.display = 'none';
     elements.messages.innerHTML = '';
     
